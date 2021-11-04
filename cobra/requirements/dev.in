@@ -2,3 +2,8 @@
 
 django-stubs
 djangorestframework-stubs
+
+flake8
+isort
+black
+mypy
