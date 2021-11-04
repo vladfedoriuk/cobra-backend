@@ -1,4 +1,4 @@
-IN_DIR=requirements
+IN_DIR=cobra/requirements
 
 objects = $(wildcard $(IN_DIR)/*.in)
 outputs = $(objects:.in=.txt)

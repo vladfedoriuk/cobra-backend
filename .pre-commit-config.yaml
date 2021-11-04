@@ -34,4 +34,4 @@ repos:
     rev: v0.910-1
     hooks:
       - id: mypy
-        entry: pip install requirements/dev.txt && mypy --install-types
+        entry: mypy_init.sh
