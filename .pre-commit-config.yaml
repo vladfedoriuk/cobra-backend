@@ -34,4 +34,4 @@ repos:
     rev: v0.910-1
     hooks:
       - id: mypy
-        entry: mypy_init.sh
+        entry: ./mypy_init.sh
