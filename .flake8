@@ -4,5 +4,6 @@ exclude =
     .git,
     __pycache__,
     manage.py,
-    */__init__.py
+    */__init__.py,
+    */settings/*,
 max-line-length = 120
