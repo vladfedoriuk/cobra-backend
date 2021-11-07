@@ -106,7 +106,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "user.CustomUser"
 
-
+DEFAULT_ADMIN_INFO = {
+    "username": "admin",
+    "first_name": "Admin",
+    "last_name": "Admin",
+    "email": "admin@example.com",
+    "password": "pass4admin",
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 

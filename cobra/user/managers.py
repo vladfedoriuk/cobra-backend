@@ -1,5 +1,6 @@
 from typing import Optional, Tuple, cast
 
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
@@ -60,11 +61,10 @@ class CustomUserManager(BaseUserManager):
                 email=self.normalize_email(email),
                 first_name=first_name,
                 last_name=last_name,
+                password=make_password(password),
                 **kwargs,
             ),
         )
-
-        user.set_password(password)
         user.save(using=self._db)
         return user
 
