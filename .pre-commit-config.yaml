@@ -2,7 +2,7 @@
 default_language_version:
   python: python3.9
 default_stages: [ commit ]
-fail_fast: true
+fail_fast: false
 minimum_pre_commit_version: 2.15.0
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

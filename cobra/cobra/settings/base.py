@@ -30,14 +30,19 @@ ALLOWED_HOSTS: list[str] = []
 
 # Application definition
 
+PROJECT_APPS = [
+    "user.apps.UserConfig",
+]
+
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-]
+] + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,6 +103,8 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+AUTH_USER_MODEL = "user.CustomUser"
 
 
 # Internationalization

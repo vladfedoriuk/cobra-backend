@@ -1,4 +1,4 @@
 #!/bin/bash
 
-pip install -r cobra/requirements/dev.txt
+pip install -r cobra/requirements/dev.txt > /dev/null
 mypy .
