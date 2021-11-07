@@ -17,7 +17,7 @@ class CustomUserManager(BaseUserManager):
         password: Optional[str] = None,
     ) -> Tuple[str, str, str, str, str]:
         if not username:
-            raise ValueError("Users must have the username")
+            raise ValueError(_("Users must have the username"))
 
         if not email:
             raise ValueError(_("Users must have an email address"))

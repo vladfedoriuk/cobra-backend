@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -34,6 +34,11 @@ openapi_urlpatterns = [
     ),
 ]
 
+api_root_urls = [
+    path("", include(("user.api.urls", "user"), namespace="user")),
+]
+
 urlpatterns = openapi_urlpatterns + [
     path("admin/", admin.site.urls),
+    path("api/", include(api_root_urls)),
 ]

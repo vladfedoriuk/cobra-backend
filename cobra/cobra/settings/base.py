@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -117,15 +117,48 @@ DEFAULT_ADMIN_INFO = {
     "password": "pass4admin",
 }
 
+
+# CELERY
+# https://docs.celeryproject.org/en/stable/userguide/configuration.html#configuration
+# https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html
+
+CELERY_BROKER_URL = "amqp://cobra:cobra@127.0.0.1:5672//"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = "UTC"
+
+
+# Django Rest Framework
+# https://www.django-rest-framework.org/
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
+
+# JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/
+
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("JWT",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+
+# Djoser
+# https://djoser.readthedocs.io/en/latest/index.html
+
+DJOSER = {
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "SEND_ACTIVATION_EMAIL": True,
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 

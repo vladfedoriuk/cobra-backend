@@ -4,11 +4,11 @@ services:
   db:
     image: postgres # use the latest official postgres version
     env_file:
-      - ../.env/db.env # configure postgres
+      - ../.env/db.env # configure PostgreSQL environment
     ports:
       - "127.0.0.1:15432:5432" # map a port on the local machine to the port 5432
     volumes:
-      - pgdata:/var/lib/postgresql/data # persist data on the host machine even if the container gets destroyed.
+      - pg_data:/var/lib/postgresql/data # persist data on the host machine even if the container gets destroyed.
     networks:
       - cobranet
     logging:
@@ -17,8 +17,31 @@ services:
         max-size: "1024k"
         max-file: "5"
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    volumes:
+      - rabbitmq_etc:/etc/rabbitmq/ # persist the RabbitMQ configuration
+      - rabbitmq_data:/var/lib/rabbitmq/ # persist the RabbitMQ data
+      - rabbitmq_logs:/var/log/rabbitmq/ # persist the RabbitMQ logs
+    env_file:
+      - ../.env/rabbitmq.env # configure the RabbiMQ environment
+    networks:
+      - cobranet
+    ports:
+      - "127.0.0.1:5672:5672" # the broker
+      - "127.0.0.1:15672:15672" # the management UI tool.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+
 volumes:
-  pgdata:
+  pg_data:
+  rabbitmq_etc:
+  rabbitmq_data:
+  rabbitmq_logs:
 
 networks:
   cobranet:

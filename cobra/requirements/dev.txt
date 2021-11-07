@@ -4,13 +4,24 @@
 #
 #    pip-compile --output-file=cobra/requirements/dev.txt cobra/requirements/dev.in
 #
+amqp==5.0.6
+    # via
+    #   -r cobra/requirements/base.txt
+    #   kombu
+    #   librabbitmq
 asgiref==3.4.1
     # via
     #   -r cobra/requirements/base.txt
     #   django
     #   djoser
+billiard==3.6.4.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
 black==21.10b0
     # via -r cobra/requirements/dev.in
+celery[librabbitmq]==5.1.2
+    # via -r cobra/requirements/base.txt
 certifi==2021.10.8
     # via
     #   -r cobra/requirements/base.txt
@@ -23,8 +34,26 @@ charset-normalizer==2.0.7
     # via
     #   -r cobra/requirements/base.txt
     #   requests
-click==8.0.3
-    # via black
+click==7.1.2
+    # via
+    #   -r cobra/requirements/base.txt
+    #   black
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
+click-didyoumean==0.3.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
+click-plugins==1.1.1
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
+click-repl==0.2.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
 coreapi==2.3.3
     # via
     #   -r cobra/requirements/base.txt
@@ -100,6 +129,14 @@ jinja2==3.0.2
     # via
     #   -r cobra/requirements/base.txt
     #   coreschema
+kombu==5.2.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
+librabbitmq==2.0.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   celery
 markupsafe==2.0.1
     # via
     #   -r cobra/requirements/base.txt
@@ -128,6 +165,10 @@ pathspec==0.9.0
     # via black
 platformdirs==2.4.0
     # via black
+prompt-toolkit==3.0.22
+    # via
+    #   -r cobra/requirements/base.txt
+    #   click-repl
 psycopg2==2.9.1
     # via -r cobra/requirements/base.txt
 pycodestyle==2.8.0
@@ -154,6 +195,7 @@ python3-openid==3.2.0
 pytz==2021.3
     # via
     #   -r cobra/requirements/base.txt
+    #   celery
     #   django
 regex==2021.11.2
     # via black
@@ -179,6 +221,8 @@ ruamel.yaml.clib==0.2.6
 six==1.16.0
     # via
     #   -r cobra/requirements/base.txt
+    #   click-repl
+    #   librabbitmq
     #   social-auth-app-django
 social-auth-app-django==4.0.0
     # via
@@ -217,3 +261,16 @@ urllib3==1.26.7
     # via
     #   -r cobra/requirements/base.txt
     #   requests
+vine==5.0.0
+    # via
+    #   -r cobra/requirements/base.txt
+    #   amqp
+    #   celery
+    #   kombu
+wcwidth==0.2.5
+    # via
+    #   -r cobra/requirements/base.txt
+    #   prompt-toolkit
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

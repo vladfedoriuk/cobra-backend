@@ -21,6 +21,7 @@ pre-commit_install:
 	pre-commit install
 
 install_dev: pre-commit_install
+	./logs_init.sh
 	pip install -r $(IN_DIR)/dev.txt
 	pip install pip-tools
 
@@ -40,3 +41,7 @@ development: services
 down:
 	docker-compose -p cobra -f $(DOCKER_DIR)/docker-compose.services.yml -f $(DOCKER_DIR)/docker-compose.dev.yml down \
 	 --remove-orphans
+
+celery-dev:
+	cd cobra && \
+	celery --app=cobra worker --loglevel=info --logfile=logs/celery.log
