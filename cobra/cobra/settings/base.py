@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
+    "rest_framework",
+    "djoser",
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
@@ -112,6 +115,16 @@ DEFAULT_ADMIN_INFO = {
     "last_name": "Admin",
     "email": "admin@example.com",
     "password": "pass4admin",
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("JWT",),
 }
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
