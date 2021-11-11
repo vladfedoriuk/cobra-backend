@@ -12,12 +12,20 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 from .logging import LOGGING
 
 LOGGING = LOGGING
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Frontend settings
+BASE_FRONTEND_URL = "http://127.0.0.1:3000"
+
+# Application information
+APPLICATION_NAME = _("Cobra")
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,7 +43,7 @@ ALLOWED_HOSTS: list[str] = []
 # Application definition
 
 PROJECT_APPS = [
-    "user.apps.UserConfig",
+    "cobra.user.apps.UserConfig",
 ]
 
 INSTALLED_APPS = [
@@ -61,7 +69,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "cobra.urls"
+ROOT_URLCONF = "cobra.cobra.urls"
 
 TEMPLATES = [
     {
@@ -77,13 +85,16 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "libraries": {
+                "user_utils": "cobra.user.utils",
+            },
         },
     },
 ]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-WSGI_APPLICATION = "cobra.wsgi.application"
+WSGI_APPLICATION = "cobra.cobra.wsgi.application"
 
 
 # Database
@@ -125,6 +136,7 @@ DEFAULT_ADMIN_INFO = {
     "password": "pass4admin",
 }
 
+DEFAULT_FROM_EMAIL = DEFAULT_ADMIN_INFO["email"]
 
 # CELERY
 # https://docs.celeryproject.org/en/stable/userguide/configuration.html#configuration
@@ -164,8 +176,8 @@ SIMPLE_JWT = {
 DJOSER = {
     "USER_CREATE_PASSWORD_RETYPE": True,
     "SEND_ACTIVATION_EMAIL": True,
+    "ACTIVATION_URL": BASE_FRONTEND_URL + "/{uid}/{token}/",
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

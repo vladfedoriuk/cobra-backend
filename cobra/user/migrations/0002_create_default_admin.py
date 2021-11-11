@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.db import IntegrityError, migrations
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django")
 
 
 def create_default_admin(apps, schema_editor):

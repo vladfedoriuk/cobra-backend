@@ -1,0 +1,17 @@
+{% extends "email/base.html" %}
+
+{% load i18n %}
+{% load user_utils %}
+
+
+{% block title %}
+{% translate "Account activation" %}
+{% endblock %}
+
+{% block content %}
+
+{%translate "Hi" %} <strong>{{user.get_full_name}}<strong>,
+
+{% translate "To finish your registration at "%}{% settings_value "APPLICATION_NAME" %}, {%translate "please follow the link" %}: {{activation_url}}.
+
+{% endblock %}

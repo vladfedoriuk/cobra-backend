@@ -2,8 +2,9 @@
 
 import django.contrib.auth.validators
 import django.utils.timezone
-import user.managers
 from django.db import migrations, models
+
+import cobra.user.managers
 
 
 class Migration(migrations.Migration):
@@ -128,7 +129,7 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
             managers=[
-                ("objects", user.managers.CustomUserManager()),
+                ("objects", cobra.user.managers.CustomUserManager()),
             ],
         ),
     ]

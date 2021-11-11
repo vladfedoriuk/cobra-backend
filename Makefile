@@ -16,19 +16,19 @@ $(IN_DIR)/prod.txt: $(IN_DIR)/base.txt
 	pip-compile -v --output-file $@ $<
 
 # pre-commit
-pre-commit_install:
+pre-commit-install:
 	pip install pre-commit
 	pre-commit install
 
-install_dev: pre-commit_install
+install-dev: pre-commit_install
 	./logs_init.sh
 	pip install -r $(IN_DIR)/dev.txt
 	pip install pip-tools
 
-check_all:
+check-all:
 	pre-commit run --all-files
 
-pre-commit_update:
+pre-commit-update:
 	pre-commit autoupdate
 
 # docker
@@ -43,5 +43,4 @@ down:
 	 --remove-orphans
 
 celery-dev:
-	cd cobra && \
-	celery --app=cobra worker --loglevel=info --logfile=logs/celery.log
+	celery --app=cobra.cobra worker -E

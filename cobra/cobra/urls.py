@@ -35,7 +35,7 @@ openapi_urlpatterns = [
 ]
 
 api_root_urls = [
-    path("", include(("user.api.urls", "user"), namespace="user")),
+    path("", include(("cobra.user.api.urls", "user"), namespace="user")),
 ]
 
 urlpatterns = openapi_urlpatterns + [
