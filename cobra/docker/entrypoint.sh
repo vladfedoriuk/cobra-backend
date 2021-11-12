@@ -9,5 +9,5 @@ if [ "$1" = "run_cobra_dev" ]; then
 fi
 
 if [ "$1" = "run_celery_dev" ]; then
-	celery --app=cobra worker --loglevel=info --logfile=logs/celery.log
+  celery --app=cobra.cobra worker -E
 fi

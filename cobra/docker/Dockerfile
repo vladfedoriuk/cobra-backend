@@ -4,12 +4,12 @@ FROM base as builder
 RUN adduser --disabled-password --gecos '' cobra
 ENV PYTHONUNBUFFERED 1
 COPY --chown=cobra [ \
-    "requirements/base.txt", \
-     "requirements/dev.txt", \
-     "requirements/prod.txt", \
+    "cobra/requirements/base.txt", \
+     "cobra/requirements/dev.txt", \
+     "cobra/requirements/prod.txt", \
      "/tmp/" \
     ]
-COPY --chown=cobra ./docker/entrypoint.sh /entrypoint.sh
+COPY --chown=cobra ./cobra/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 FROM builder as dev
 
 ENV DEBUG 1
-ENV DJANGO_SETTINGS_MODEULE 'cobra.settings.dev'
+ENV DJANGO_SETTINGS_MODEULE 'cobra.cobra.settings.dev'
 
 RUN --mount=type=cache,target=/root/.cache/pip \
      pip install -r /tmp/dev.txt

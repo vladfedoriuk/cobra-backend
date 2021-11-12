@@ -142,7 +142,6 @@ DEFAULT_FROM_EMAIL = DEFAULT_ADMIN_INFO["email"]
 # https://docs.celeryproject.org/en/stable/userguide/configuration.html#configuration
 # https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html
 
-CELERY_BROKER_URL = "amqp://cobra:cobra@127.0.0.1:5672//"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

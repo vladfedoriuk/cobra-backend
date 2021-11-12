@@ -10,7 +10,7 @@ services:
       - ../.env/app.env # configure application
       - ../.env/rabbitmq.env
     volumes:
-      - ..:/code
+      - ../../:/code
     logging:
       driver: "json-file"
       options:
