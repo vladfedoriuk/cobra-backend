@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import default_token_generator
 from django.forms import Form
-from djoser import utils
+from djoser import utils as djoser_utils
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser
@@ -41,7 +41,7 @@ def get_jwt_tokens_for_user(user: AbstractUser) -> JWTPair:
 
 def get_uid_and_token_for_user(user: AbstractUser) -> UIDTokenPair:
     return {
-        "uid": utils.encode_uid(user.pk),
+        "uid": djoser_utils.encode_uid(user.pk),
         "token": default_token_generator.make_token(user),
     }
 
