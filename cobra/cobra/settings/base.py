@@ -183,6 +183,11 @@ DJOSER = {
 
 LANGUAGE_CODE = "en-us"
 
+LANGUAGES: list[tuple[str, str]] = [
+    ("en", _("English")),
+    ("pl", _("Polish")),
+]
+
 TIME_ZONE = "UTC"
 
 USE_I18N = True

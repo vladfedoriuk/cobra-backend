@@ -1,5 +1,7 @@
 -r base.txt
 
+# mypy and linters
+
 django-stubs
 djangorestframework-stubs
 
@@ -7,3 +9,9 @@ flake8
 isort
 black
 mypy
+
+# testing
+
+Faker
+factory_boy
+parameterized

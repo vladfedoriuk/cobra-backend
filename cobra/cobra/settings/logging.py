@@ -10,7 +10,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
         },
         "file": {
@@ -22,7 +22,7 @@ LOGGING = {
     },
     "loggers": {
         "root": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": [
                 "file",
                 "console",

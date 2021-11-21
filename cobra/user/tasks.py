@@ -18,8 +18,8 @@ logger = logging.getLogger("celery")
 def send_activation_email(user_pk):
     try:
         user = CustomUser.objects.get(pk=user_pk)
-    except (CustomUser.DoesNotExist, CustomUser.MultipleObjectsReturned) as e:
-        logger.error(f"Failed to get a user by pk={user_pk}: {e}")
+    except (CustomUser.DoesNotExist, CustomUser.MultipleObjectsReturned):
+        logger.error("Failed to get a user by pk=%s", user_pk)
         return
 
     context = {
@@ -40,4 +40,5 @@ def send_activation_email(user_pk):
         },
     )
     template_email_service = TemplateEmailService()
+    logger.info("Sending the activation email to the user with pk=%s", user_pk)
     template_email_service.send(template_email)
