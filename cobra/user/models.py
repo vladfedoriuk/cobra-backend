@@ -18,4 +18,7 @@ class CustomUser(AbstractUser):
         max_length=255,
     )
 
+    first_name = models.CharField(_("first name"), max_length=150)  # remove blank=True
+    last_name = models.CharField(_("last name"), max_length=150)  # remove blank=True
+
     objects: Manager["AbstractUser"] = CustomUserManager()  # type: ignore

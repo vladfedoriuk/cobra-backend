@@ -46,6 +46,8 @@ coreschema==0.0.4
     #   -r cobra/requirements/base.txt
     #   coreapi
     #   drf-yasg
+coverage==6.2
+    # via -r cobra/requirements/dev.in
 cryptography==35.0.0
     # via
     #   -r cobra/requirements/base.txt

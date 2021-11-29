@@ -1,3 +1,4 @@
+from collections import ChainMap
 from typing import Optional, Union
 
 from django.contrib.auth.hashers import check_password
@@ -18,19 +19,20 @@ class CustomUserManagerTest(TestCase):
 
     @parameterized.expand(
         [
-            (default_user_create_data, None),
-            (default_user_create_data | {"first_name": None}, ValueError),
-            (default_user_create_data | {"last_name": None}, ValueError),
-            (default_user_create_data | {"email": None}, ValueError),
-            (default_user_create_data | {"username": None}, ValueError),
-            (default_user_create_data | {"password": None}, None),
+            ({}, None),
+            ({"first_name": None}, ValueError),
+            ({"last_name": None}, ValueError),
+            ({"email": None}, ValueError),
+            ({"username": None}, ValueError),
+            ({"password": None}, None),
             (
-                default_user_create_data | {"is_active": False},
+                {"is_active": False},
                 None,
-            ),  # test no implicit is_active setting
+            ),  # test no enforced is_active setting
         ]
     )
     def test_create_user(self, user_data, exception_class):
+        user_data = ChainMap(user_data, self.default_user_create_data)
         if exception_class:
             with self.assertRaises(exception_class):
                 CustomUser.objects.create_user(**user_data)
@@ -44,13 +46,14 @@ class CustomUserManagerTest(TestCase):
 
     @parameterized.expand(
         [
-            (default_user_create_data, None),
-            (default_user_create_data | {"is_active": False}, ValueError),
-            (default_user_create_data | {"is_staff": False}, ValueError),
-            (default_user_create_data | {"is_superuser": False}, ValueError),
+            ({}, None),
+            ({"is_active": False}, ValueError),
+            ({"is_staff": False}, ValueError),
+            ({"is_superuser": False}, ValueError),
         ]
     )
     def test_create_superuser(self, user_data, exception_class):
+        user_data = ChainMap(user_data, self.default_user_create_data)
         if exception_class:
             with self.assertRaises(exception_class):
                 CustomUser.objects.create_superuser(**user_data)

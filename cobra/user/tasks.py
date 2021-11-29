@@ -42,3 +42,33 @@ def send_activation_email(user_pk):
     template_email_service = TemplateEmailService()
     logger.info("Sending the activation email to the user with pk=%s", user_pk)
     template_email_service.send(template_email)
+
+
+@shared_task
+def send_password_reset_email(user_pk):
+    try:
+        user = CustomUser.objects.get(pk=user_pk)
+    except (CustomUser.DoesNotExist, CustomUser.MultipleObjectsReturned):
+        logger.error("Failed to get a user by pk=%s", user_pk)
+        return
+
+    context = {
+        "user": user,
+        "password_reset_url": djoser_settings.PASSWORD_RESET_CONFIRM_URL.format(
+            **get_uid_and_token_for_user(user)
+        ),
+    }
+    to = user.email
+
+    template_email = TemplateEmail(
+        subject=_("User password reset"),
+        mail_from=settings.DEFAULT_FROM_EMAIL,
+        mail_to=to,
+        template={
+            "path": "email/password_reset.html",
+            "context": context,
+        },
+    )
+    template_email_service = TemplateEmailService()
+    logger.info("Sending the password reset email to the user with pk=%s", user_pk)
+    template_email_service.send(template_email)

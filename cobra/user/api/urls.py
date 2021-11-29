@@ -17,13 +17,23 @@ urlpatterns = [
     ),
     path(
         "auth/activate/",
-        AuthUserViewSet.as_view({"post": "activate"}),
+        AuthUserViewSet.as_view({"post": "activation"}),
         name="api-auth-activate",
     ),
     path(
         "auth/activate/resend/",
         AuthUserViewSet.as_view({"post": "resend_activation"}),
         name="api-auth-activate-resend",
+    ),
+    path(
+        "auth/reset_password/",
+        AuthUserViewSet.as_view({"post": "reset_password"}),
+        name="api-auth-reset-password",
+    ),
+    path(
+        "auth/reset_password/confirm/",
+        AuthUserViewSet.as_view({"post": "reset_password_confirm"}),
+        name="api-auth-reset-password-confirm",
     ),
     path(
         "auth/jwt/create/",

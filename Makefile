@@ -44,3 +44,9 @@ down:
 
 celery-dev:
 	celery --app=cobra.cobra worker -E
+
+test:
+	coverage run --source='cobra' manage.py test
+
+coverage: test
+	coverage report

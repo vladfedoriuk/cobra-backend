@@ -1,3 +1,4 @@
+import types
 from collections import OrderedDict
 from typing import Dict, TypedDict, Union, cast
 from unittest import TestCase
@@ -9,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db import models
 from django.forms import Form
 from djoser import utils as djoser_utils
+from drf_yasg.utils import swagger_auto_schema
 from factory import Factory
 from faker import Faker
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -104,3 +106,11 @@ locales: Dict[str, Union[int, float]] = OrderedDict(
 )
 
 fake = Faker(locales)
+
+
+def configure_swagger(cls):
+    swagger_methods_data = getattr(cls, "swagger_methods_data", {})
+    for method_name, data in swagger_methods_data.items():
+        if isinstance(method := getattr(cls, method_name), types.FunctionType):
+            setattr(cls, method_name, swagger_auto_schema(**data)(method))
+    return cls
