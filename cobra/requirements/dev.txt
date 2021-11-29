@@ -60,12 +60,15 @@ defusedxml==0.7.1
 django==3.2.9
     # via
     #   -r cobra/requirements/base.txt
+    #   django-extensions
     #   django-jazzmin
     #   django-stubs
     #   django-stubs-ext
     #   djangorestframework
     #   djangorestframework-simplejwt
     #   drf-yasg
+django-extensions==3.1.5
+    # via -r cobra/requirements/dev.in
 django-jazzmin==2.4.8
     # via -r cobra/requirements/base.txt
 django-stubs==1.9.0

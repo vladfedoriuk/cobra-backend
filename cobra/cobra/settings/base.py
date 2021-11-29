@@ -179,8 +179,8 @@ DJOSER = {
     "USERNAME_RESET_SHOW_EMAIL_NOT_FOUND": True,
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
     "PASSWORD_RESET_CONFIRM_URL": BASE_FRONTEND_URL
-    + "password/reset/confirm/{uid}/{token}/",
-    "ACTIVATION_URL": BASE_FRONTEND_URL + "activate/{uid}/{token}/",
+    + "/password/reset/confirm/{uid}/{token}/",
+    "ACTIVATION_URL": BASE_FRONTEND_URL + "/activate/{uid}/{token}/",
 }
 
 # Internationalization

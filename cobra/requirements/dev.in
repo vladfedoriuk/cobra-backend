@@ -16,3 +16,6 @@ Faker
 factory_boy
 parameterized
 coverage
+
+# extensions
+django-extensions
