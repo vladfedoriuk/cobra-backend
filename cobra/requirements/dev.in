@@ -16,6 +16,8 @@ Faker
 factory_boy
 parameterized
 coverage
+freezegun
+types-freezegun
 
 # extensions
 django-extensions

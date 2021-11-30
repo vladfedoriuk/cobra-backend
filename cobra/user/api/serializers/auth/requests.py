@@ -1,8 +1,4 @@
-from djoser.serializers import (
-    ActivationSerializer,
-    PasswordResetConfirmRetypeSerializer,
-    UserCreatePasswordRetypeSerializer,
-)
+from djoser import serializers as djoser_serializers
 from rest_framework import serializers
 
 
@@ -14,13 +10,15 @@ class ResetPasswordRequestSerializer(ResendActivationRequestSerializer):
     pass
 
 
-class ResetPasswordConfirmRequestSerializer(PasswordResetConfirmRetypeSerializer):
+class ResetPasswordConfirmRequestSerializer(
+    djoser_serializers.PasswordResetConfirmRetypeSerializer
+):
     pass
 
 
-class ActivationRequestSerializer(ActivationSerializer):
+class ActivationRequestSerializer(djoser_serializers.ActivationSerializer):
     pass
 
 
-class RegisterRequestSerializer(UserCreatePasswordRetypeSerializer):
+class RegisterRequestSerializer(djoser_serializers.UserCreatePasswordRetypeSerializer):
     pass

@@ -1,4 +1,5 @@
 from collections import ChainMap
+from datetime import timedelta
 from typing import Any, Optional
 from unittest import mock
 
@@ -7,22 +8,31 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
 from django.http import HttpRequest
 from django.test import RequestFactory, TestCase, override_settings
-from django.urls import reverse
+from django.urls import path, reverse
+from django.utils import timezone
 from djoser.conf import settings as djoser_settings
+from freezegun import freeze_time
 from parameterized import parameterized
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.test import APIClient, APITestCase, URLPatternsTestCase
+from rest_framework.views import APIView
 
-from cobra.user.api.views import AuthUserViewSet
+from cobra.user.api.views import (
+    AuthUserViewSet,
+    JWTTokenObtainPairView,
+    JWTTokenRefreshView,
+    JWTTokenVerifyView,
+)
 from cobra.user.factories import UserFactory
 from cobra.user.models import CustomUser
-from cobra.user.utils import UIDTokenPair, fake, get_uid_and_token_for_user
+from cobra.user.utils import JWTPair, UIDTokenPair, fake, get_uid_and_token_for_user
 
 DJOSER: dict[str, Any] = settings.DJOSER
 
 
 class TestAuthUserViewSet(TestCase):
-
     default_user_register_data: dict[str, Optional[str]] = {
         "username": "test",
         "first_name": fake.first_name(),
@@ -373,3 +383,112 @@ class TestAuthUserViewSet(TestCase):
         response: Response = self.reset_password_confirm_view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(check_password(password, user.password))
+
+
+class TestJwtViews(APITestCase, URLPatternsTestCase):
+    client: APIClient
+
+    class TestApiView(APIView):
+        permission_classes = [IsAuthenticated]
+
+        def get(self, *args, **kwargs):
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    urlpatterns = [
+        path(
+            "auth/jwt/create/",
+            JWTTokenObtainPairView.as_view(),
+            name="api-auth-jwt-create",
+        ),
+        path(
+            "auth/jwt/refresh/",
+            JWTTokenRefreshView.as_view(),
+            name="api-auth-jwt-refresh",
+        ),
+        path(
+            "auth/jwt/verify/",
+            JWTTokenVerifyView.as_view(),
+            name="api-auth-jwt-verify",
+        ),
+        path("test/", TestApiView.as_view(), name="api-auth-test"),
+    ]
+
+    def setUp(self):
+        self.jwt_create_url: str = reverse("api-auth-jwt-create")
+        self.jwt_refresh_url: str = reverse("api-auth-jwt-refresh")
+        self.jwt_verify_url: str = reverse("api-auth-jwt-verify")
+        self.test_endpoint_url: str = reverse("api-auth-test")
+
+    def test_not_authenticated_request(self):
+        response: Response = self.client.get(self.test_endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_jwt_authorization(self):
+        user: CustomUser = UserFactory()
+        password: str = fake.password()
+        user.set_password(password)
+        user.save()
+        response: Response = self.client.post(
+            self.jwt_create_url,
+            data={
+                "username": user.username,
+                "password": password,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(response.data)
+        credentials: JWTPair = response.data
+        self.assertIsNotNone(access := credentials.get("access"))
+        self.assertIsNotNone(credentials.get("refresh"))
+        self.client.credentials(HTTP_AUTHORIZATION=f"JWT {access}")
+        response: Response = self.client.get(self.test_endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_jwt_refresh(self):
+        user: CustomUser = UserFactory()
+        password: str = fake.password()
+        user.set_password(password)
+        user.save()
+        response: Response = self.client.post(
+            self.jwt_create_url,
+            data={
+                "username": user.username,
+                "password": password,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(response.data)
+        credentials: JWTPair = response.data
+        self.assertIsNotNone(access := credentials.get("access"))
+        self.assertIsNotNone(refresh := credentials.get("refresh"))
+        response: Response = self.client.post(
+            self.jwt_verify_url,
+            data={
+                "token": access,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        now = timezone.now()
+        token_lifetime: timedelta = settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"]
+        with freeze_time(lambda: now + 2 * token_lifetime):
+            self._test_refresh_token(access, refresh)
+
+    def _test_refresh_token(self, access, refresh):
+        response: Response = self.client.post(
+            self.jwt_verify_url,
+            data={
+                "token": access,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(
+            response.data["detail"].code,
+            "token_not_valid",
+            "The token must be expired.",
+        )
+        response: Response = self.client.post(
+            self.jwt_refresh_url, data={"refresh": refresh}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        credentials: JWTPair = response.data
+        self.assertIsNotNone(credentials.get("access"))

@@ -1,5 +1,5 @@
-from djoser.serializers import UserSerializer
+from djoser import serializers as djoser_serializers
 
 
-class RegisterResponseSerializer(UserSerializer):
+class RegisterResponseSerializer(djoser_serializers.UserSerializer):
     pass
