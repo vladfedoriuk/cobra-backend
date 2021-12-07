@@ -27,7 +27,6 @@ BASE_FRONTEND_URL = "http://127.0.0.1:3000"
 # Application information
 APPLICATION_NAME = _("Cobra")
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -38,7 +37,6 @@ SECRET_KEY = "django-insecure-rmhii&6$^5ch%3in)3azf64zkfw5!nd4ha-z$uza%z_c=d2q2r
 DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
-
 
 # Application definition
 
@@ -57,9 +55,12 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework",
     "djoser",
+    "corsheaders",
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -96,7 +97,6 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 WSGI_APPLICATION = "cobra.cobra.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -106,7 +106,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -148,7 +147,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_ENABLE_UTC = True
 CELERY_TIMEZONE = "UTC"
 
-
 # Django Rest Framework
 # https://www.django-rest-framework.org/
 
@@ -157,7 +155,6 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
-
 
 # JWT
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/
@@ -168,7 +165,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "BLACKLIST_AFTER_ROTATION": False,
 }
-
 
 # Djoser
 # https://djoser.readthedocs.io/en/latest/index.html
@@ -183,6 +179,13 @@ DJOSER = {
     + "/password/reset/confirm/{uid}/{token}/",
     "ACTIVATION_URL": BASE_FRONTEND_URL + "/activate/{uid}/{token}/",
 }
+
+# django-cors-headers
+# https://github.com/adamchainz/django-cors-headers
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -202,7 +205,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -211,7 +213,6 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "commons",
 ]
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

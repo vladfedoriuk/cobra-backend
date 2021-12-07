@@ -37,10 +37,13 @@ defusedxml==0.7.1
 django==3.2.9
     # via
     #   -r cobra/requirements/base.in
+    #   django-cors-headers
     #   django-jazzmin
     #   djangorestframework
     #   djangorestframework-simplejwt
     #   drf-yasg
+django-cors-headers==3.10.1
+    # via -r cobra/requirements/base.in
 django-jazzmin==2.4.8
     # via -r cobra/requirements/base.in
 django-templated-mail==1.1.1

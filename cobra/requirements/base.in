@@ -6,3 +6,4 @@ djangorestframework_simplejwt
 djoser
 drf-yasg
 celery
+django-cors-headers

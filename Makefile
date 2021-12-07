@@ -4,7 +4,7 @@ DOCKER_DIR=cobra/docker
 objects = $(wildcard $(IN_DIR)/*.in)
 outputs = $(objects:.in=.txt)
 
-.PHONY: requirements install_dev check_all pre-commit_update services down development
+.PHONY: requirements install-dev check-all pre-commit_update services down development
 
 requirements: $(outputs)
 
