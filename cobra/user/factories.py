@@ -1,8 +1,9 @@
 import factory
 from factory.django import DjangoModelFactory
 
+from cobra.utils.test import fake
+
 from .models import CustomUser
-from .utils import fake
 
 
 class UserFactory(DjangoModelFactory):

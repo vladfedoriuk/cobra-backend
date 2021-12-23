@@ -37,3 +37,30 @@ LOGGING = {
         },
     },
 }
+
+CELERY_LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"}
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+        "celery": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "file",
+            "filename": BASE_DIR / "logs" / "celery.log",
+        },
+    },
+    "loggers": {
+        "celery": {
+            "handlers": ["celery", "console"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+    },
+}

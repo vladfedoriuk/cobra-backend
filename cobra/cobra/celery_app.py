@@ -4,7 +4,7 @@ import os
 
 from celery import Celery, signals
 
-from cobra.cobra.settings.base import BASE_DIR
+from cobra.cobra.settings.logging import CELERY_LOGGING
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cobra.cobra.settings.dev")
 
@@ -27,31 +27,5 @@ def debug_task(self):
 
 @signals.setup_logging.connect
 def on_celery_setup_logging(**kwargs):
-    config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"}
-        },
-        "handlers": {
-            "console": {
-                "level": "DEBUG",
-                "class": "logging.StreamHandler",
-            },
-            "celery": {
-                "level": "INFO",
-                "class": "logging.FileHandler",
-                "formatter": "file",
-                "filename": BASE_DIR / "logs" / "celery.log",
-            },
-        },
-        "loggers": {
-            "celery": {
-                "handlers": ["celery", "console"],
-                "propagate": True,
-                "level": "DEBUG",
-            },
-        },
-    }
-
+    config = CELERY_LOGGING
     logging.config.dictConfig(config)

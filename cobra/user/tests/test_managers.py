@@ -1,21 +1,15 @@
 from collections import ChainMap
-from typing import Optional, Union
 
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from parameterized import parameterized
 
 from cobra.user.models import CustomUser
+from cobra.user.utils import USER_CREATE_DATA
 
 
 class CustomUserManagerTest(TestCase):
-    default_user_create_data: dict[str, Optional[Union[str, bool]]] = {
-        "username": "test_user",
-        "first_name": "Test first name",
-        "last_name": "Test last name",
-        "email": "test@example.com",
-        "password": "pass4test321!",
-    }
+    default_user_create_data = USER_CREATE_DATA
 
     @parameterized.expand(
         [

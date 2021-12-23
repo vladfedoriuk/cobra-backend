@@ -87,7 +87,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
             ],
             "libraries": {
-                "user_utils": "cobra.user.utils",
+                "settings_utils": "cobra.utils.settings",
             },
         },
     },

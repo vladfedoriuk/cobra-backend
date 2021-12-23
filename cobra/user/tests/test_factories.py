@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from cobra.user.factories import UserFactory
 from cobra.user.models import CustomUser
-from cobra.user.utils import TestFactoryMixin
+from cobra.utils.test import TestFactoryMixin
 
 
 class UserFactoryTest(TestCase, TestFactoryMixin):

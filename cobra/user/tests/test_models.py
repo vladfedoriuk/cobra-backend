@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from cobra.user.managers import CustomUserManager
 from cobra.user.models import CustomUser
-from cobra.user.utils import fake
+from cobra.utils.test import fake
 
 
 class CustomUserTest(TestCase):

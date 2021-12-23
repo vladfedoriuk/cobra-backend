@@ -26,7 +26,7 @@ from cobra.user.api.serializers.auth.requests import (
 )
 from cobra.user.api.serializers.auth.responses import RegisterResponseSerializer
 from cobra.user.tasks import send_activation_email, send_password_reset_email
-from cobra.user.utils import configure_swagger
+from cobra.utils.swagger import configure_swagger
 
 
 @configure_swagger

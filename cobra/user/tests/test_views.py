@@ -1,6 +1,6 @@
 from collections import ChainMap
 from datetime import timedelta
-from typing import Any, Optional
+from typing import Any
 from unittest import mock
 
 from django.conf import settings
@@ -27,20 +27,15 @@ from cobra.user.api.views import (
 )
 from cobra.user.factories import UserFactory
 from cobra.user.models import CustomUser
-from cobra.user.utils import JWTPair, UIDTokenPair, fake, get_uid_and_token_for_user
+from cobra.user.utils import USER_REGISTER_DATA, get_uid_and_token_for_user
+from cobra.utils.test import fake
+from cobra.utils.types import JWTPair, UIDTokenPair
 
 DJOSER: dict[str, Any] = settings.DJOSER
 
 
 class TestAuthUserViewSet(TestCase):
-    default_user_register_data: dict[str, Optional[str]] = {
-        "username": "test",
-        "first_name": fake.first_name(),
-        "last_name": fake.last_name(),
-        "email": fake.email(),
-        "password": "pass4test321!",
-        "re_password": "pass4test321!",
-    }
+    default_user_register_data = USER_REGISTER_DATA
 
     def setUp(self):
         self.request_factory: RequestFactory = RequestFactory()
