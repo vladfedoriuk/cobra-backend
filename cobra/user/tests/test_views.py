@@ -333,7 +333,7 @@ class TestAuthUserViewSet(TestCase):
         password = fake.password()
         self.assertFalse(check_password(password, user.password))
         data = ChainMap(
-            uid_token, {"new_password": password, "re_new_password": password}
+            dict(uid_token), {"new_password": password, "re_new_password": password}
         )
         request: HttpRequest = self.request_factory.post(
             self.reset_password_confirm_url, data=data

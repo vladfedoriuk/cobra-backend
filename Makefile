@@ -20,7 +20,7 @@ pre-commit-install:
 	pip install pre-commit
 	pre-commit install
 
-install-dev: pre-commit_install
+install-dev: pre-commit-install
 	./logs_init.sh
 	pip install -r $(IN_DIR)/dev.txt
 	pip install pip-tools
