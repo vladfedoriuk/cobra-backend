@@ -5,7 +5,7 @@ from django.test import TestCase
 from parameterized import parameterized
 
 from cobra.user.models import CustomUser
-from cobra.user.utils import USER_CREATE_DATA
+from cobra.user.utils.test import USER_CREATE_DATA
 
 
 class CustomUserManagerTest(TestCase):

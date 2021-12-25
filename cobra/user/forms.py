@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
-from .models import CustomUser
-from .utils import MakeUserFormFieldsRequiredMixin
+from cobra.user.models import CustomUser
+from cobra.user.utils.forms import MakeUserFormFieldsRequiredMixin
 
 
 class CustomUserCreationForm(MakeUserFormFieldsRequiredMixin, UserCreationForm):

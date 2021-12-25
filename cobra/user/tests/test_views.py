@@ -27,7 +27,8 @@ from cobra.user.api.views import (
 )
 from cobra.user.factories import UserFactory
 from cobra.user.models import CustomUser
-from cobra.user.utils import USER_REGISTER_DATA, get_uid_and_token_for_user
+from cobra.user.utils.auth import get_uid_and_token_for_user
+from cobra.user.utils.test import USER_REGISTER_DATA
 from cobra.utils.test import fake
 from cobra.utils.types import JWTPair, UIDTokenPair
 

@@ -6,7 +6,7 @@ from celery import shared_task
 from cobra.services.email.common import send_mail
 from cobra.services.email.models import TemplateEmail
 from cobra.user.models import CustomUser
-from cobra.user.utils import (
+from cobra.user.utils.tasks import (
     get_activation_email_to_user,
     get_password_reset_email_to_user,
     get_user_or_none_by_pk,

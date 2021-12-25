@@ -1,57 +1,16 @@
 import logging
-from typing import Optional, Union, cast
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tokens import default_token_generator
-from django.forms import Form
 from django.utils.translation import gettext_lazy as _
-from djoser import utils as djoser_utils
 from djoser.conf import settings as djoser_settings
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from cobra.services.email.models import TemplateEmail
 from cobra.user.models import CustomUser
-from cobra.utils.test import fake
-from cobra.utils.types import JWTPair, UIDTokenPair
+from cobra.user.utils.auth import get_uid_and_token_for_user
 
 logger = logging.getLogger("django")
-
-
-class MakeUserFormFieldsRequiredMixin:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name in CustomUser.REQUIRED_FIELDS:
-            cast(Form, self).fields[field_name].required = True
-
-
-def get_jwt_tokens_for_user(user: AbstractUser) -> JWTPair:
-    refresh = RefreshToken.for_user(user)
-
-    return {
-        "refresh": str(refresh),
-        "access": str(refresh.access_token),
-    }
-
-
-def get_uid_and_token_for_user(user: AbstractUser) -> UIDTokenPair:
-    return {
-        "uid": djoser_utils.encode_uid(user.pk),
-        "token": default_token_generator.make_token(user),
-    }
-
-
-USER_CREATE_DATA: dict[str, Optional[Union[str, bool]]] = {
-    "username": "test_user",
-    "first_name": fake.first_name(),
-    "last_name": fake.last_name(),
-    "email": fake.email(),
-    "password": "pass4test321!",
-}
-
-USER_REGISTER_DATA: dict[str, Optional[Union[str, bool]]] = USER_CREATE_DATA | {
-    "re_password": USER_CREATE_DATA["password"],
-}
 
 
 def get_user_or_none_by_pk(user_pk) -> Optional[AbstractUser]:

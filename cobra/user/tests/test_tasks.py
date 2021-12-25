@@ -7,14 +7,14 @@ from djoser.conf import settings as djoser_settings
 from cobra.user.factories import UserFactory
 from cobra.user.models import CustomUser
 from cobra.user.tasks import send_activation_email, send_password_reset_email
-from cobra.user.utils import get_uid_and_token_for_user
+from cobra.user.utils.auth import get_uid_and_token_for_user
 
 
 class CeleryTasksTest(TestCase):
     def setUp(self):
         self.user: CustomUser = UserFactory.create()
 
-    @mock.patch("cobra.user.tasks.logger")
+    @mock.patch("cobra.user.utils.tasks.logger")
     def test_send_activation_email_user_does_not_exist(
         self, mock_logger: mock.MagicMock
     ):
@@ -28,8 +28,8 @@ class CeleryTasksTest(TestCase):
         )
 
     @mock.patch("cobra.user.tasks.logger")
-    @mock.patch("cobra.user.tasks.TemplateEmail")
-    @mock.patch("cobra.user.tasks.TemplateEmailService")
+    @mock.patch("cobra.user.utils.tasks.TemplateEmail")
+    @mock.patch("cobra.services.email.common.TemplateEmailService")
     def test_send_activation_email(
         self,
         mock_template_email_service: mock.MagicMock,
@@ -57,7 +57,7 @@ class CeleryTasksTest(TestCase):
             },
         )
 
-    @mock.patch("cobra.user.tasks.logger")
+    @mock.patch("cobra.user.utils.tasks.logger")
     def test_send_password_rest_email_user_does_not_exist(
         self, mock_logger: mock.MagicMock
     ):
@@ -71,8 +71,8 @@ class CeleryTasksTest(TestCase):
         )
 
     @mock.patch("cobra.user.tasks.logger")
-    @mock.patch("cobra.user.tasks.TemplateEmail")
-    @mock.patch("cobra.user.tasks.TemplateEmailService")
+    @mock.patch("cobra.user.utils.tasks.TemplateEmail")
+    @mock.patch("cobra.services.email.common.TemplateEmailService")
     def test_send_password_reset_email(
         self,
         mock_template_email_service: mock.MagicMock,
