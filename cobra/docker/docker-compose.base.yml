@@ -1,20 +1,24 @@
 version: "3"
 
 services:
-  app:
+  app: &app
     restart: always
     networks:
       - cobranet
     env_file:
       - ../.env/db.env # configure postgres
       - ../.env/app.env # configure application
+      - ../.env/rabbitmq.env
     volumes:
-      - ..:/code
+      - ../../:/code
     logging:
       driver: "json-file"
       options:
         max-size: "1024k"
         max-file: "5"
+
+  celery:
+    <<: *app
 
 networks:
   cobranet:

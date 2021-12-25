@@ -1,2 +1,9 @@
 Django
 djangorestframework
+psycopg2
+django-jazzmin
+djangorestframework_simplejwt
+djoser
+drf-yasg
+celery
+django-cors-headers

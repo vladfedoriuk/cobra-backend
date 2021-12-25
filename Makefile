@@ -4,7 +4,7 @@ DOCKER_DIR=cobra/docker
 objects = $(wildcard $(IN_DIR)/*.in)
 outputs = $(objects:.in=.txt)
 
-.PHONY: requirements install_dev check_all pre-commit_update services down development
+.PHONY: requirements install-dev check-all pre-commit_update services down development
 
 requirements: $(outputs)
 
@@ -16,18 +16,19 @@ $(IN_DIR)/prod.txt: $(IN_DIR)/base.txt
 	pip-compile -v --output-file $@ $<
 
 # pre-commit
-pre-commit_install:
+pre-commit-install:
 	pip install pre-commit
 	pre-commit install
 
-install_dev: pre-commit_install
+install-dev: pre-commit-install
+	./logs_init.sh
 	pip install -r $(IN_DIR)/dev.txt
 	pip install pip-tools
 
-check_all:
+check-all:
 	pre-commit run --all-files
 
-pre-commit_update:
+pre-commit-update:
 	pre-commit autoupdate
 
 # docker
@@ -40,3 +41,12 @@ development: services
 down:
 	docker-compose -p cobra -f $(DOCKER_DIR)/docker-compose.services.yml -f $(DOCKER_DIR)/docker-compose.dev.yml down \
 	 --remove-orphans
+
+celery-dev:
+	celery --app=cobra.cobra worker -E
+
+test:
+	coverage run --source='cobra' manage.py test
+
+coverage: test
+	coverage report
