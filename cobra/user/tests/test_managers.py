@@ -22,7 +22,7 @@ class CustomUserManagerTest(TestCase):
             (
                 {"is_active": False},
                 None,
-            ),  # test no enforced is_active setting
+            ),  # tests no enforced is_active setting
         ]
     )
     def test_create_user(self, user_data, exception_class):

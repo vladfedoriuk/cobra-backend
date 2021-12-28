@@ -42,6 +42,7 @@ ALLOWED_HOSTS: list[str] = []
 
 PROJECT_APPS = [
     "cobra.user.apps.UserConfig",
+    "cobra.project.apps.ProjectConfig",
 ]
 
 INSTALLED_APPS = [
@@ -127,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "user.CustomUser"
 
-DEFAULT_ADMIN_INFO = {
+DEFAULT_ADMIN_INFO: dict[str, str] = {
     "username": "admin",
     "first_name": "Admin",
     "last_name": "Admin",
