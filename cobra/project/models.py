@@ -1,4 +1,4 @@
-from typing import Sequence, Union
+from typing import Union
 
 from django.conf import settings
 from django.db import models
@@ -6,8 +6,18 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from cobra.project.managers import ProjectManager
-from cobra.project.utils.models import ProjectRelated
+from cobra.project.managers import BugManager, ProjectManager, UserStoryManager
+from cobra.project.utils.models import (
+    DEVELOPER,
+    INVITATION_STATUSES,
+    NEW,
+    PENDING,
+    ROLES,
+    TASK,
+    TASK_STATUSES,
+    TASK_TYPES,
+    ProjectRelated,
+)
 from cobra.utils.models import (
     TimeStampedAndCreatedByUser,
     TimeStampedAndRelatedToUser,
@@ -51,14 +61,6 @@ class Project(TimeStampedAndCreatedByUser):
         return f"{self.creator.username}:{self.slug}"
 
 
-DEVELOPER = "developer"
-MAINTAINER = "maintainer"
-ROLES: Sequence[tuple[str, str]] = (
-    (DEVELOPER, _("Developer")),
-    (MAINTAINER, _("Maintainer")),
-)
-
-
 class ProjectMembership(TimeStampedModel):
     project = models.ForeignKey(
         Project,
@@ -80,16 +82,6 @@ class ProjectMembership(TimeStampedModel):
                 fields=["project", "user"], name="project_and_user_unique_constraint"
             )
         ]
-
-
-PENDING = "pending"
-ACCEPTED = "accepted"
-REJECTED = "rejected"
-INVITATION_STATUSES: Sequence[tuple[str, str]] = (
-    (PENDING, _("Pending")),
-    (ACCEPTED, _("Accepted")),
-    (REJECTED, _("Rejected")),
-)
 
 
 class ProjectInvitation(
@@ -130,18 +122,6 @@ class Epic(TimeStampedAndCreatedByUser, ProjectRelated):
     description = models.TextField(_("description"))
 
 
-NEW = "new"
-IN_PROGRESS = "in-progress"
-CLOSED = "closed"
-RELEASE_READY = "release-ready"
-TASK_STATUSES: Sequence[tuple[str, str]] = (
-    (NEW, _("New")),
-    (IN_PROGRESS, _("In progress")),
-    (CLOSED, _("Closed")),
-    (RELEASE_READY, _("Release ready")),
-)
-
-
 class Task(TimeStampedAndCreatedByUser, ProjectRelated):
     assignee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -154,6 +134,7 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
     status = models.CharField(
         _("status"), max_length=20, choices=TASK_STATUSES, default=NEW
     )
+    type = models.CharField(_("type"), max_length=20, choices=TASK_TYPES, default=TASK)
     title = models.CharField(_("title"), max_length=250)
     description = models.TextField(_("description"))
     estimate = models.DecimalField(
@@ -176,3 +157,17 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
         verbose_name=_("related epic"),
         related_name="tasks",
     )
+
+
+class Bug(Task):
+    objects: models.Manager["Bug"] = BugManager()
+
+    class Meta:
+        proxy = True
+
+
+class UserStory(Task):
+    objects: models.Manager["UserStory"] = UserStoryManager()
+
+    class Meta:
+        proxy = True

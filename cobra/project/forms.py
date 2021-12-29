@@ -2,12 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from cobra.project.models import (
-    MAINTAINER,
-    Project,
-    ProjectInvitation,
-    ProjectMembership,
-)
+from cobra.project.models import Project, ProjectInvitation, ProjectMembership
+from cobra.project.utils.models import MAINTAINER
 from cobra.user.models import CustomUser
 
 
@@ -21,9 +17,9 @@ class ProjectAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        user: CustomUser = cleaned_data.get("user")
+        user: CustomUser = cleaned_data.get("creator")
         slug: Project = cleaned_data.get("slug")
-        if Project.objects.filter(user=user, slug=slug).exists():
+        if Project.objects.filter(creator=user, slug=slug).exists():
             raise ValidationError(
                 _(
                     "There is already a project with such a slug belonging to the given user"
@@ -46,7 +42,7 @@ class ProjectInvitationAdminForm(forms.ModelForm):
             ProjectMembership.objects.filter(
                 user=inviter, role=MAINTAINER, project=project
             ).exists()
-            or project.user == inviter
+            or project.creator == inviter
         ):
             self.add_error(
                 "inviter",

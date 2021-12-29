@@ -55,13 +55,14 @@ class ProjectAdmin(admin.ModelAdmin):
 
     @admin.display(description=_("Creator"), ordering="creator")
     def creator_full_name(self, obj):
-        return obj.user.get_full_name()
+        return obj.creator.get_full_name()
 
 
 class ProjectInvitationAdmin(admin.ModelAdmin):
     form = ProjectInvitationAdminForm
     list_display = (
         "user_full_name",
+        "inviter_full_name",
         "project",
         "status",
         "is_active",
@@ -107,6 +108,10 @@ class ProjectInvitationAdmin(admin.ModelAdmin):
     @admin.display(description=_("User"), ordering="user")
     def user_full_name(self, obj):
         return obj.user.get_full_name()
+
+    @admin.display(description=_("Inviter"), ordering="inviter")
+    def inviter_full_name(self, obj):
+        return obj.inviter.get_full_name()
 
     @admin.display(boolean=True, ordering="-created", description="Is active?")
     def is_active(self, obj):
