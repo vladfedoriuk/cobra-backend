@@ -5,8 +5,18 @@ from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 
-from cobra.project.forms import ProjectAdminForm, ProjectInvitationAdminForm
-from cobra.project.models import Project, ProjectInvitation
+from cobra.project.forms import (
+    ProjectAdminForm,
+    ProjectInvitationAdminForm,
+    ProjectMembershipAdminForm,
+)
+from cobra.project.models import (
+    Epic,
+    Project,
+    ProjectInvitation,
+    ProjectMembership,
+    Task,
+)
 
 
 class CustomUserListFilter(admin.SimpleListFilter):
@@ -23,9 +33,106 @@ class CustomUserListFilter(admin.SimpleListFilter):
             return queryset.filter(user__pk=self.value())
 
 
+class ProjectListFilter(admin.SimpleListFilter):
+    title = _("project")
+    parameter_name = "project"
+
+    def lookups(self, request, model_admin):
+        yield from [(str(obj.pk), str(obj)) for obj in Project.objects.all()]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(project__pk=self.value())
+
+
+class TaskInline(admin.StackedInline):
+    model = Task
+    extra = 1
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "project":
+            kwargs["queryset"] = Project.objects.filter(
+                pk=getattr(self, "parent_obj").pk
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_formset(self, request, obj=None, **kwargs):
+        setattr(self, "parent_obj", obj)
+        return super().get_formset(request, obj, **kwargs)
+
+
 class CreatorListFilter(CustomUserListFilter):
     title = _("Creator")
     parameter_name = "creator"
+
+
+class ProjectMembershipInline(admin.TabularInline):
+    model = ProjectMembership
+    extra = 1
+
+
+class ProjectMembershipAdmin(admin.ModelAdmin):
+    add_form = ProjectMembershipAdminForm
+    list_display = ("id", "user_full_name", "project", "role")
+    list_filter = ("project", "role", "modified", "created", CustomUserListFilter)
+    search_fields = ("project", "user")
+    raw_id_fields = ("project", "user")
+    date_hierarchy = "created"
+    ordering = ("-modified", "created")
+    readonly_fields = ("created", "modified")
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "user",
+                    "project",
+                    "role",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("created", "modified")}),
+    )
+
+    @admin.display(description=_("User"), ordering="user")
+    def user_full_name(self, obj):
+        return obj.user.get_full_name()
+
+
+class EpicAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "user_full_name",
+        "project",
+    )
+    list_filter = ("modified", "created", CustomUserListFilter, ProjectListFilter)
+    search_fields = ("project", "creator", "title", "description")
+    raw_id_fields = ("project", "creator")
+    date_hierarchy = "created"
+    ordering = ("-modified", "created")
+    readonly_fields = ("created", "modified")
+
+    inlines = (TaskInline,)
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "description",
+                    "creator",
+                    "project",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("created", "modified")}),
+    )
+
+    @admin.display(description=_("Creator"), ordering="creator")
+    def user_full_name(self, obj):
+        return obj.creator.get_full_name()
 
 
 class ProjectAdmin(admin.ModelAdmin):
@@ -52,6 +159,8 @@ class ProjectAdmin(admin.ModelAdmin):
         ),
         (_("Important dates"), {"fields": ("created", "modified")}),
     )
+
+    inlines = (ProjectMembershipInline,)
 
     @admin.display(description=_("Creator"), ordering="creator")
     def creator_full_name(self, obj):
@@ -118,5 +227,7 @@ class ProjectInvitationAdmin(admin.ModelAdmin):
         return not obj.is_expired
 
 
+admin.site.register(Epic, EpicAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectInvitation, ProjectInvitationAdmin)
+admin.site.register(ProjectMembership, ProjectMembershipAdmin)

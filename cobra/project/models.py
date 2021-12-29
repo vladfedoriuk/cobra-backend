@@ -83,6 +83,12 @@ class ProjectMembership(TimeStampedModel):
             )
         ]
 
+    def __repr__(self):
+        return f"ProjectMembership(project={self.project}, user={self.user})"
+
+    def __str__(self):
+        return f"{self.project} membership of the user {self.user}"
+
 
 class ProjectInvitation(
     TimeStampedAndRelatedToUser, ProjectRelated, UUIDPrimaryKeyModel
@@ -120,6 +126,14 @@ class ProjectInvitation(
 class Epic(TimeStampedAndCreatedByUser, ProjectRelated):
     title = models.CharField(_("title"), max_length=250)
     description = models.TextField(_("description"))
+
+    def __repr__(self):
+        return (
+            f"Epic(creator={self.creator}, project={self.project}, title={self.title})"
+        )
+
+    def __str__(self):
+        return f"{self.title} in {self.project}"
 
 
 class Task(TimeStampedAndCreatedByUser, ProjectRelated):
@@ -171,3 +185,19 @@ class UserStory(Task):
 
     class Meta:
         proxy = True
+
+
+class LoggedTime(TimeStampedAndRelatedToUser):
+    time = models.DecimalField(
+        _("logged time"),
+        help_text=_("spent time working on a task"),
+        decimal_places=2,
+        max_digits=5,
+    )
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        verbose_name=_("task"),
+        related_name="logged_time",
+    )
+    comment = models.CharField(_("optional comment"), max_length=255, blank=True)

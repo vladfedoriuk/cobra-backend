@@ -15,17 +15,6 @@ class ProjectAdminForm(forms.ModelForm):
     class Meta(ExcludeDatesMeta):
         model = Project
 
-    def clean(self):
-        cleaned_data = super().clean()
-        user: CustomUser = cleaned_data.get("creator")
-        slug: Project = cleaned_data.get("slug")
-        if Project.objects.filter(creator=user, slug=slug).exists():
-            raise ValidationError(
-                _(
-                    "There is already a project with such a slug belonging to the given user"
-                )
-            )
-
 
 class ProjectInvitationAdminForm(forms.ModelForm):
     class Meta(ExcludeDatesMeta):
@@ -52,3 +41,8 @@ class ProjectInvitationAdminForm(forms.ModelForm):
                     )
                 ),
             )
+
+
+class ProjectMembershipAdminForm(forms.ModelForm):
+    class Meta(ExcludeDatesMeta):
+        model = ProjectMembership
