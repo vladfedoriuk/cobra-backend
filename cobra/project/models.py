@@ -175,6 +175,4 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
         on_delete=models.CASCADE,
         verbose_name=_("related epic"),
         related_name="tasks",
-        blank=True,
-        null=True,
     )
