@@ -181,6 +181,10 @@ DJOSER = {
     "ACTIVATION_URL": BASE_FRONTEND_URL + "/activate/{uid}/{token}/",
 }
 
+# Project invitation
+PROJECT_INVITATION_URL: str = BASE_FRONTEND_URL + "/invitation/{id}/"
+PROJECT_INVITATION_LIFETIME: timedelta = timedelta(days=1)
+
 # django-cors-headers
 # https://github.com/adamchainz/django-cors-headers
 CORS_ALLOWED_ORIGINS = [

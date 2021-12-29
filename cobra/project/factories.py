@@ -12,7 +12,7 @@ class ProjectFactory(DjangoModelFactory):
         model = Project
 
     title = factory.Faker("sentence", nb_words=4)
-    user = factory.SubFactory(UserFactory)
+    creator = factory.SubFactory(UserFactory)
 
     @factory.post_generation
     def members(self, create, extracted, **kwargs):

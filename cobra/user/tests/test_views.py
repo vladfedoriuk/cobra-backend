@@ -387,7 +387,10 @@ class TestJwtViews(APITestCase, URLPatternsTestCase):
     class TestApiView(APIView):
         permission_classes = [IsAuthenticated]
 
-        def get(self, *args, **kwargs):
+        def get(self, request, *args, **kwargs):
+            assert (
+                request.user.is_authenticated
+            ), "The user must be authenticated to access this resource."
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     urlpatterns = [

@@ -1,0 +1,18 @@
+{% extends "email/base.html" %}
+
+{% load i18n %}
+{% load settings_utils %}
+
+
+{% block title %}
+{% translate "Invitation to join a project" %}
+{% endblock %}
+
+{% block content %}
+
+{% translate "Hi" %} {{user.get_full_name}},
+
+{% translate "User "%}<strong>{{inviter.get_full_name}}</strong>{% translate " invites you to work together on " %}<strong>{{project.title}}</strong>{% translate " at " %}<strong>{% settings_value "APPLICATION_NAME" %}<strong>.
+{% translate "Please, follow the " %}<a href="{{invitation_url}}">{% translate "link" %}</a>{% translate " to accept the invitation." %}
+
+{% endblock %}

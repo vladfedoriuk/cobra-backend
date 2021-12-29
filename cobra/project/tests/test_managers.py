@@ -12,7 +12,7 @@ class ProjectManagerTest(TestCase):
 
     def test_create_without_slug(self):
         title: str = fake.sentence(nb_words=4)
-        project: Project = Project.objects.create(title=title, user=self.user)
+        project: Project = Project.objects.create(title=title, creator=self.user)
         self.assertEqual(project.title, title)
         self.assertEqual(project.slug, slugify(title))
 
@@ -20,14 +20,15 @@ class ProjectManagerTest(TestCase):
         title: str = fake.sentence(nb_words=4)
         slug: str = fake.slug()
         project: Project = Project.objects.create(
-            title=title, slug=slug, user=self.user
+            title=title, slug=slug, creator=self.user
         )
         self.assertEqual(project.slug, slug)
         self.assertNotEqual(project.slug, slugify(project.title))
 
     def test_bulk_create(self):
         projects: list[Project] = [
-            Project(title=fake.sentence(nb_words=4), user=self.user) for _ in range(4)
+            Project(title=fake.sentence(nb_words=4), creator=self.user)
+            for _ in range(4)
         ]
         Project.objects.bulk_create(projects)
         for project in projects:
@@ -36,12 +37,14 @@ class ProjectManagerTest(TestCase):
 
     def test_get_or_create(self):
         title: str = fake.sentence(nb_words=4)
-        project, created = Project.objects.get_or_create(user=self.user, title=title)
+        project, created = Project.objects.get_or_create(creator=self.user, title=title)
         self.assertTrue(created)
         self.assertEqual(project.slug, slugify(project.title))
 
     def test_update_or_create(self):
         title: str = fake.sentence(nb_words=4)
-        project, created = Project.objects.update_or_create(user=self.user, title=title)
+        project, created = Project.objects.update_or_create(
+            creator=self.user, title=title
+        )
         self.assertTrue(created)
         self.assertEqual(project.slug, slugify(project.title))

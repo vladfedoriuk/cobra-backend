@@ -10,8 +10,8 @@ from cobra.utils.test import TestFactoryMixin, fake
 
 class ProjectFactoryTest(TestCase, TestFactoryMixin):
     factory_class = ProjectFactory
-    must_be_not_none = ["title", "user", "slug"]
-    must_be_unique_together = ["user", "slug"]
+    must_be_not_none = ["title", "creator", "slug"]
+    must_be_unique_together = ["creator", "slug"]
 
     def setUp(self) -> None:
         user: CustomUser = UserFactory()
@@ -20,7 +20,7 @@ class ProjectFactoryTest(TestCase, TestFactoryMixin):
 
         self.test_with_given_property = [
             ({"name": "title", "value": title}, title),
-            ({"name": "user", "value": user}, user),
+            ({"name": "creator", "value": user}, user),
             ({"name": "slug", "value": slug}, slug),
         ]
 
