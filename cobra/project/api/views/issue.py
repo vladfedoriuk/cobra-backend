@@ -39,6 +39,11 @@ class IssueUpdateRetrieveViewSet(
             context["issue"] = self.get_object()
         return context
 
+    def get_permissions(self):
+        if self.action in ("logged_time", "comments") and self.request.method == "GET":
+            self.permission_classes = [IsIssueProjectMember | IsIssueProjectCreator]
+        return super().get_permissions()
+
     @action(
         detail=True,
         methods=LOGGED_TIME_METHODS,
