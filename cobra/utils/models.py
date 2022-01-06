@@ -1,12 +1,11 @@
 import uuid
-from typing import Any, Optional, Union, cast
+from typing import Any, Optional, Type, TypeVar, Union, cast
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Manager, QuerySet
-from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _
 
 
@@ -65,7 +64,10 @@ class UUIDPrimaryKeyModel(models.Model):
         abstract = True
 
 
-def get_queryset(resource: Union[ModelBase, QuerySet, Manager]) -> QuerySet:
+ModelType = TypeVar("ModelType", bound=models.Model)
+
+
+def get_queryset(resource: Union[Type[ModelType], QuerySet, Manager]) -> QuerySet:
     if hasattr(resource, "_default_manager"):
         queryset: QuerySet = getattr(resource, "_default_manager").all()
         return queryset
@@ -77,11 +79,11 @@ def get_queryset(resource: Union[ModelBase, QuerySet, Manager]) -> QuerySet:
 
 
 def get_object_or_none(
-    resource: Union[ModelBase, QuerySet, Manager], *args, **kwargs
-) -> Optional[models.Model]:
+    resource: Union[Type[ModelType], QuerySet, Manager], *args, **kwargs
+) -> Optional[ModelType]:
     queryset = get_queryset(resource)
     try:
-        instance: models.Model = queryset.get(*args, **kwargs)
+        instance: ModelType = queryset.get(*args, **kwargs)
         return instance
     except (queryset.model.DoesNotExist, queryset.model.MultipleObjectsReturned):
         return None

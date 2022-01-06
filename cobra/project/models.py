@@ -6,17 +6,25 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from cobra.project.managers import BugManager, ProjectManager, UserStoryManager
+from cobra.project.managers import (
+    BugManager,
+    ProjectManager,
+    TaskManager,
+    UserStoryManager,
+)
 from cobra.project.utils.models import (
+    ACCEPTED,
     DEVELOPER,
     INVITATION_STATUSES,
     NEW,
     PENDING,
+    REJECTED,
     ROLES,
     TASK,
     TASK_STATUSES,
     TASK_TYPES,
-    ProjectRelated,
+    RelatedToIssue,
+    RelatedToProject,
 )
 from cobra.utils.models import (
     TimeStampedAndCreatedByUser,
@@ -28,7 +36,8 @@ from cobra.utils.models import (
 
 class Project(TimeStampedAndCreatedByUser):
     title = models.CharField(_("title"), max_length=250)
-    slug = models.SlugField(_("slug"), max_length=250)
+    description = models.TextField(_("description"), blank=True)
+    slug = models.SlugField(_("slug"), max_length=250, blank=True)
 
     class Meta:
         constraints: list[
@@ -91,7 +100,7 @@ class ProjectMembership(TimeStampedModel):
 
 
 class ProjectInvitation(
-    TimeStampedAndRelatedToUser, ProjectRelated, UUIDPrimaryKeyModel
+    TimeStampedAndRelatedToUser, RelatedToProject, UUIDPrimaryKeyModel
 ):
     inviter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -106,6 +115,18 @@ class ProjectInvitation(
     @property
     def is_expired(self) -> bool:
         return timezone.now() > self.created + settings.PROJECT_INVITATION_LIFETIME
+
+    @property
+    def is_pending(self):
+        return self.status == PENDING
+
+    @property
+    def is_accepted(self):
+        return self.status == ACCEPTED
+
+    @property
+    def is_rejected(self):
+        return self.status == REJECTED
 
     def get_absolute_url(self) -> str:
         return settings.PROJECT_INVITATION_URL.format(id=self.id)
@@ -123,25 +144,25 @@ class ProjectInvitation(
         return f"{self.inviter} invites {self.user} to join a project {self.project}"
 
 
-class Epic(TimeStampedAndCreatedByUser, ProjectRelated):
+class Epic(TimeStampedAndCreatedByUser, RelatedToProject):
     title = models.CharField(_("title"), max_length=250)
-    description = models.TextField(_("description"))
+    description = models.TextField(_("description"), blank=True)
 
     def __repr__(self):
         return (
-            f"Epic(creator={self.creator}, project={self.project}, title={self.title})"
+            f"Epic(title={self.title}, creator={self.creator}, project={self.project})"
         )
 
     def __str__(self):
-        return f"{self.title} in {self.project}"
+        return f"Epic: '{self.title}' in {self.project}"
 
 
-class Task(TimeStampedAndCreatedByUser, ProjectRelated):
+class Issue(TimeStampedAndCreatedByUser, RelatedToProject):
     assignee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         verbose_name=_("assignee"),
-        related_name="assigned_tasks",
+        related_name="assigned_issues",
         blank=True,
         null=True,
     )
@@ -150,7 +171,7 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
     )
     type = models.CharField(_("type"), max_length=20, choices=TASK_TYPES, default=TASK)
     title = models.CharField(_("title"), max_length=250)
-    description = models.TextField(_("description"))
+    description = models.TextField(_("description"), blank=True)
     estimate = models.DecimalField(
         _("time estimate"),
         help_text=_("Time estimation in hours."),
@@ -160,8 +181,8 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
     parent = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
-        verbose_name=_("parent task"),
-        related_name="subtasks",
+        verbose_name=_("parent issue"),
+        related_name="child_issues",
         blank=True,
         null=True,
     )
@@ -169,35 +190,69 @@ class Task(TimeStampedAndCreatedByUser, ProjectRelated):
         Epic,
         on_delete=models.CASCADE,
         verbose_name=_("related epic"),
-        related_name="tasks",
+        related_name="issues",
+        blank=True,
+        null=True,
     )
 
+    def __repr__(self):
+        return (
+            f"{self.__class__}(title={self.title}, project={self.project}, creator={self.creator}, "
+            f"assignee={self.assignee})"
+        )
 
-class Bug(Task):
+    def __str__(self):
+        return f"{self.__class__}: '{self.title}' in {self.project}"
+
+
+class Task(Issue):
+    objects: models.Manager["Task"] = TaskManager()
+
+    class Meta:
+        proxy = True
+
+
+class Bug(Issue):
     objects: models.Manager["Bug"] = BugManager()
 
     class Meta:
         proxy = True
 
 
-class UserStory(Task):
+class UserStory(Issue):
     objects: models.Manager["UserStory"] = UserStoryManager()
 
     class Meta:
         proxy = True
+        verbose_name = _("User story")
+        verbose_name_plural = _("User stories")
 
 
-class LoggedTime(TimeStampedAndRelatedToUser):
+class LoggedTime(TimeStampedAndRelatedToUser, RelatedToIssue):
     time = models.DecimalField(
         _("logged time"),
-        help_text=_("spent time working on a task"),
+        help_text=_("spent time working on an issue"),
         decimal_places=2,
         max_digits=5,
     )
-    task = models.ForeignKey(
-        Task,
-        on_delete=models.CASCADE,
-        verbose_name=_("task"),
-        related_name="logged_time",
-    )
     comment = models.CharField(_("optional comment"), max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = _("Logged time")
+        verbose_name_plural = _("Logged time")
+
+    def __repr__(self):
+        return f"LoggedTime(user{self.user}, issue={self.issue}, time={self.time}"
+
+    def __str__(self):
+        return f"User {self.user} logged {self.time} working on {self.issue}"
+
+
+class IssueComment(TimeStampedAndRelatedToUser, RelatedToIssue):
+    content = models.TextField(_("content"))
+
+    def __repr__(self):
+        return f"IssueComment(user={self.user}, issue={self.issue}"
+
+    def __str__(self):
+        return f"User {self.user} comments {self.issue}"
