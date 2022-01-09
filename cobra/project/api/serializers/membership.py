@@ -19,9 +19,9 @@ class ProjectMembershipSerializer(FlexFieldsModelSerializer):
         model = ProjectMembership
         fields = "__all__"
         expandable_fields = {
-            "members": (
+            "user": (
                 CustomUserSerializer,
-                {"fields": COMMON_USER_FIELDS, "many": True},
+                {"fields": COMMON_USER_FIELDS, "many": False},
             ),
             "project": (ProjectSerializer, {"fields": COMMON_PROJECT_FIELDS}),
         }

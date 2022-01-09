@@ -1,6 +1,9 @@
+from django.db.models import QuerySet
 from rest_flex_fields import FlexFieldsModelViewSet
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -28,7 +31,12 @@ from cobra.user.utils.serializers import ActiveCustomUserEmailSerializer
 
 
 class ProjectViewSet(FlexFieldsModelViewSet):
-    permit_list_expands = ["creator", "members", "project"]
+    permit_list_expands = [
+        "creator",
+        "members",
+        "project",
+        "user",
+    ]
     permission_classes = [IsAuthenticated]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -122,3 +130,25 @@ class ProjectViewSet(FlexFieldsModelViewSet):
                 Issue.objects.filter(project=self.get_object()), many=True
             )
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class RetrieveProjectApiView(GenericAPIView, RetrieveModelMixin):
+    queryset = Project.objects.all()
+    permission_classes = [
+        CustomIsAdminUser | IsProjectCreator | IsProjectMemberAndReadOnly
+    ]
+    serializer_class = ProjectSerializer
+    filter_backends = [IsProjectMemberOrCreatorFilterBackend]
+
+    def get_object(self) -> Project:
+        queryset: QuerySet[Project] = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            "creator__username": self.kwargs.get("username"),
+            "slug": self.kwargs.get("slug"),
+        }
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def get(self, *args, **kwargs):
+        return self.retrieve(*args, **kwargs)
