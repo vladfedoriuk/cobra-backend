@@ -8,9 +8,12 @@ from cobra.project.api.serializers.project import (
 from cobra.project.models import ProjectMembership
 from cobra.project.utils.serializers import COMMON_PROJECT_FIELDS, COMMON_USER_FIELDS
 from cobra.user.utils.serializers import CustomUserSerializer
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
-class ProjectMembershipSerializer(FlexFieldsModelSerializer):
+class ProjectMembershipSerializer(
+    FlexFieldsModelSerializer, CustomValidationErrorsMixin
+):
     class Meta(ReadOnlyCreatedModifiedMeta):
         read_only_fields = ReadOnlyCreatedModifiedMeta.read_only_fields = [
             "project",

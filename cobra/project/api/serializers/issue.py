@@ -19,9 +19,12 @@ from cobra.project.utils.serializers import (
 )
 from cobra.user.models import CustomUser
 from cobra.user.utils.serializers import CustomUserSerializer
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
-class IssueSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
+class IssueSerializer(
+    FlexFieldsModelSerializer, ProjectSerializersMixin, CustomValidationErrorsMixin
+):
     default_error_messages = {
         "creator_is_not_a_member_or_project_creator": _(
             "The issue creator is not a member of the project the issue belongs to."
@@ -110,17 +113,17 @@ class IssueSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
             and creator not in project.members.all()
             and creator != project.creator
         ):
-            self.fail("creator_is_not_a_member_or_project_creator")
+            self.fail_with_default_error("creator_is_not_a_member_or_project_creator")
         if (
             project
             and assignee
             and not (project.members.all().filter(pk=assignee.pk).exists())
         ):
-            self.fail("assignee_is_not_project_member")
+            self.fail_with_default_error("assignee_is_not_project_member")
         if project and epic and epic.project != project:
-            self.fail("epic_has_wrong_project")
+            self.fail_with_default_error("epic_has_wrong_project")
         if parent and parent.project != project:
-            self.fail("parent_has_wrong_project")
+            self.fail_with_default_error("parent_has_wrong_project")
         return validated_data
 
 

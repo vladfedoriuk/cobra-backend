@@ -9,13 +9,16 @@ from cobra.project.models import Project, ProjectMembership
 from cobra.project.utils.serializers import COMMON_USER_FIELDS, ProjectSerializersMixin
 from cobra.user.utils.serializers import CustomUserSerializer
 from cobra.utils.models import get_object_or_none
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
 class ReadOnlyCreatedModifiedMeta:
     read_only_fields = ["created", "modified"]
 
 
-class ProjectSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
+class ProjectSerializer(
+    FlexFieldsModelSerializer, ProjectSerializersMixin, CustomValidationErrorsMixin
+):
     default_error_messages = {
         "user_is_not_authenticated": _(
             "User authentication is required to perform this action."
@@ -46,7 +49,7 @@ class ProjectSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
     def create(self, validated_data: dict[str, Any]):
         user: Optional[AbstractUser] = self.context_user
         if not user or not user.is_authenticated:
-            self.fail("user_is_not_authenticated")
+            self.fail_with_default_error("user_is_not_authenticated")
         validated_data["creator"] = user
         return super().create(validated_data)
 

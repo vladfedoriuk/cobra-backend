@@ -16,9 +16,12 @@ from cobra.project.utils.serializers import (
 )
 from cobra.user.models import CustomUser
 from cobra.user.utils.serializers import CustomUserSerializer
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
-class EpicSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
+class EpicSerializer(
+    FlexFieldsModelSerializer, ProjectSerializersMixin, CustomValidationErrorsMixin
+):
     default_error_messages = {
         "creator_is_not_a_member_or_project_creator": _(
             "The epic creator is not a member of the project the epic belongs to."
@@ -65,5 +68,5 @@ class EpicSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
             and creator not in project.members.all()
             and creator != project.creator
         ):
-            self.fail("creator_is_not_a_member_or_project_creator")
+            self.fail_with_default_error("creator_is_not_a_member_or_project_creator")
         return validated_data

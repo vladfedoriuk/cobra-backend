@@ -13,7 +13,7 @@ app_name = "user"
 
 router = DefaultRouter()
 
-router.register("user", UserListViewSet)
+router.register("users", UserListViewSet)
 
 urlpatterns = [
     path(

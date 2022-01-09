@@ -17,9 +17,12 @@ from cobra.project.utils.serializers import (
 )
 from cobra.user.models import CustomUser
 from cobra.user.utils.serializers import CustomUserSerializer
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
-class ProjectInvitationSerializer(FlexFieldsModelSerializer, ProjectSerializersMixin):
+class ProjectInvitationSerializer(
+    FlexFieldsModelSerializer, ProjectSerializersMixin, CustomValidationErrorsMixin
+):
     default_error_messages = {
         "inviter_is_not_a_maintainer_or_a_creator": _(
             "The inviter must be a maintainer or the creator of the project to be able to invite new users."
@@ -65,7 +68,7 @@ class ProjectInvitationSerializer(FlexFieldsModelSerializer, ProjectSerializersM
                 or project.creator == inviter
             )
         ):
-            self.fail("inviter_is_not_a_maintainer_or_a_creator")
+            self.fail_with_default_error("inviter_is_not_a_maintainer_or_a_creator")
         if (
             project
             and user
@@ -73,7 +76,7 @@ class ProjectInvitationSerializer(FlexFieldsModelSerializer, ProjectSerializersM
                 user__pk=user.pk, project__pk=project.pk
             ).exists()
         ):
-            self.fail("user_is_already_a_member")
+            self.fail_with_default_error("user_is_already_a_member")
         if (
             project
             and user
@@ -85,7 +88,7 @@ class ProjectInvitationSerializer(FlexFieldsModelSerializer, ProjectSerializersM
                 status=PENDING,
             ).exists()
         ):
-            self.fail("pending_invitation_already_exists")
+            self.fail_with_default_error("pending_invitation_already_exists")
         return validated_data
 
     def get_is_active(self, obj: ProjectInvitation):

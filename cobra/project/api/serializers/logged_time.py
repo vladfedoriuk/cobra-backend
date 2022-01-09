@@ -14,9 +14,12 @@ from cobra.project.utils.serializers import (
 )
 from cobra.user.models import CustomUser
 from cobra.user.utils.serializers import CustomUserSerializer
+from cobra.utils.serializers import CustomValidationErrorsMixin
 
 
-class LoggedTimeSerializer(FlexFieldsModelSerializer, IssueSerializerMixin):
+class LoggedTimeSerializer(
+    FlexFieldsModelSerializer, IssueSerializerMixin, CustomValidationErrorsMixin
+):
     default_error_messages = {
         "user_is_not_a_member_of_issue_project": _(
             "The user is not a member of the project the issue belongs to."
@@ -65,5 +68,5 @@ class LoggedTimeSerializer(FlexFieldsModelSerializer, IssueSerializerMixin):
                 user__pk=user.pk, project__pk=issue.project.pk
             ).exists()
         ):
-            self.fail("user_is_not_a_member_of_issue_project")
+            self.fail_with_default_error("user_is_not_a_member_of_issue_project")
         return validated_data
