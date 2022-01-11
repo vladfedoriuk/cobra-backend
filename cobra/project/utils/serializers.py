@@ -33,5 +33,5 @@ class IssueSerializerMixin(BaseSerializerMixin):
 
 
 COMMON_USER_FIELDS: list[str] = ["id", "username", "full_name"]
-COMMON_ISSUE_FIELDS: list[str] = ["id", "username", "full_name"]
-COMMON_PROJECT_FIELDS: list[str] = ["id", "title", "type", "status", "assignee"]
+COMMON_PROJECT_FIELDS: list[str] = ["id", "title", "slug", "creator"]
+COMMON_ISSUE_FIELDS: list[str] = ["id", "title", "type", "status", "assignee"]

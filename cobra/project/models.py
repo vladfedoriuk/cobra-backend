@@ -197,12 +197,12 @@ class Issue(TimeStampedAndCreatedByUser, RelatedToProject):
 
     def __repr__(self):
         return (
-            f"{self.__class__}(title={self.title}, project={self.project}, creator={self.creator}, "
+            f"Issue(title={self.title}, project={self.project}, creator={self.creator}, "
             f"assignee={self.assignee})"
         )
 
     def __str__(self):
-        return f"{self.__class__}: '{self.title}' in {self.project}"
+        return f"Issue: '{self.title}' in {self.project}"
 
 
 class Task(Issue):

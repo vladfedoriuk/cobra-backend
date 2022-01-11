@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_flex_fields.views import FlexFieldsMixin
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -19,6 +20,7 @@ from cobra.project.utils.types import HTTP_METHODS
 
 
 class IssueUpdateRetrieveViewSet(
+    FlexFieldsMixin,
     GenericViewSet,
     UpdateModelMixin,
     RetrieveModelMixin,
@@ -29,8 +31,11 @@ class IssueUpdateRetrieveViewSet(
     permission_classes = [IsIssueProjectCreator | IsIssueProjectMember]
     filter_backends = [IsIssueProjectMemberOrCreatorFilterBackend]
 
+    permit_list_expands = ["parent", "project", "creator", "assignee"]
+
     LOGGED_TIME_METHODS: HTTP_METHODS = ["get", "post"]
     COMMENTS_METHODS = LOGGED_TIME_METHODS
+    SUBISSUES_METHODS: HTTP_METHODS = ["get"]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -81,6 +86,16 @@ class IssueUpdateRetrieveViewSet(
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=SUBISSUES_METHODS,
+        permission_classes=[IsIssueProjectMember],
+    )
+    def sub_issues(self, *args, **kwargs):
+        sub_issues = self.get_object().child_issues.all()
+        serializer = self.get_serializer(sub_issues, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class IssueListViewSet(GenericViewSet, ListModelMixin):

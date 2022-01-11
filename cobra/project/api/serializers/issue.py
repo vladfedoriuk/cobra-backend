@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -54,7 +54,7 @@ class IssueSerializer(
         creator_queryset = CustomUser.objects.filter(is_active=True)
         if creator_pk := getattr(self.context_user, "pk", None):
             creator_queryset = creator_queryset.filter(pk=creator_pk)
-        self.user_pk = creator_pk
+        self.creator_pk = creator_pk
 
         self.fields["creator"] = serializers.PrimaryKeyRelatedField(
             queryset=creator_queryset
@@ -97,7 +97,7 @@ class IssueSerializer(
             "parent": "cobra.project.api.serializers.issue.IssueSerializer",
         }
 
-    def run_validation(self, data: dict[str, Any]):
+    def run_validation(self, data):
         if self.instance is None:
             data.setdefault("creator", self.creator_pk)
             data.setdefault("project", self.project_pk)

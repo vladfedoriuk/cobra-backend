@@ -1,11 +1,16 @@
 from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from cobra.project.api.exceptions import InvitationIsNotPending, UserIsAlreadyMember
+from cobra.project.api.exceptions import (
+    InvitationHasExpired,
+    InvitationIsNotPending,
+    UserIsAlreadyMember,
+)
 from cobra.project.api.filters import IsInviterOrInvitedUserFilterBackend
 from cobra.project.api.permissions import IsInvitedUser
 from cobra.project.api.serializers.invitation import ProjectInvitationSerializer
@@ -13,7 +18,7 @@ from cobra.project.models import ProjectInvitation, ProjectMembership
 from cobra.project.utils.models import ACCEPTED, REJECTED
 
 
-class ProjectInvitationViewSet(GenericViewSet):
+class ProjectInvitationViewSet(RetrieveModelMixin, GenericViewSet):
     lookup_field = "id"
     queryset = ProjectInvitation.objects.all()
     serializer_class = ProjectInvitationSerializer
@@ -25,6 +30,8 @@ class ProjectInvitationViewSet(GenericViewSet):
         invitation: ProjectInvitation = self.get_object()
         if not invitation.is_pending:
             raise InvitationIsNotPending()
+        if invitation.is_expired:
+            raise InvitationHasExpired()
         if ProjectMembership.objects.filter(
             user__pk=invitation.user.pk, project__pk=invitation.project.pk
         ).exists():
@@ -42,6 +49,8 @@ class ProjectInvitationViewSet(GenericViewSet):
         invitation: ProjectInvitation = self.get_object()
         if not invitation.is_pending:
             raise InvitationIsNotPending()
+        if invitation.is_expired:
+            raise InvitationHasExpired()
         if ProjectMembership.objects.filter(
             user__pk=invitation.user.pk, project__pk=invitation.project.pk
         ).exists():

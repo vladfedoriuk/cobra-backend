@@ -99,7 +99,7 @@ class IsEpicProjectMemberOrCreatorFilterBackend(filters.BaseFilterBackend):
 class IssueFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = Issue
-        fields = ("type", "project")
+        fields = ("type", "project", "epic")
 
 
 class EpicFilter(django_filters.rest_framework.FilterSet):

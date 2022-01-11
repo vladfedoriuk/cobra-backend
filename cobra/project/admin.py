@@ -117,6 +117,7 @@ class EpicAdmin(admin.ModelAdmin):
     form = EpicAdminForm
     list_display = (
         "id",
+        "title",
         "user_full_name",
         "project",
     )

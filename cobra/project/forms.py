@@ -117,7 +117,7 @@ class IssueAdminForm(forms.ModelForm):
                 project__pk=self.instance.project.pk
             )
             self.fields["creator"].queryset = CustomUser.objects.filter(
-                Q(project__pk__in=self.instance.project.pk)
+                Q(project__pk__in=[self.instance.project.pk])
                 | Q(pk=self.instance.project.creator.pk)
             ).distinct()
 

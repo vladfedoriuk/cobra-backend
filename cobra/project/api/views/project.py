@@ -31,12 +31,7 @@ from cobra.user.utils.serializers import ActiveCustomUserEmailSerializer
 
 
 class ProjectViewSet(FlexFieldsModelViewSet):
-    permit_list_expands = [
-        "creator",
-        "members",
-        "project",
-        "user",
-    ]
+    permit_list_expands = ["creator", "members", "project", "user", "parent", "epic"]
     permission_classes = [IsAuthenticated]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
