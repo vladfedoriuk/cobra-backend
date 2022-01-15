@@ -42,6 +42,7 @@ ALLOWED_HOSTS: list[str] = []
 
 PROJECT_APPS = [
     "cobra.user.apps.UserConfig",
+    "cobra.project.apps.ProjectConfig",
 ]
 
 INSTALLED_APPS = [
@@ -127,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "user.CustomUser"
 
-DEFAULT_ADMIN_INFO = {
+DEFAULT_ADMIN_INFO: dict[str, str] = {
     "username": "admin",
     "first_name": "Admin",
     "last_name": "Admin",
@@ -154,6 +155,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
 # JWT
@@ -161,7 +163,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("JWT",),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "BLACKLIST_AFTER_ROTATION": False,
 }
@@ -179,6 +181,10 @@ DJOSER = {
     + "/password/reset/confirm/{uid}/{token}/",
     "ACTIVATION_URL": BASE_FRONTEND_URL + "/activate/{uid}/{token}/",
 }
+
+# Project invitation
+PROJECT_INVITATION_URL: str = BASE_FRONTEND_URL + "/invitation/{id}/"
+PROJECT_INVITATION_LIFETIME: timedelta = timedelta(days=1)
 
 # django-cors-headers
 # https://github.com/adamchainz/django-cors-headers

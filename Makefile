@@ -46,7 +46,7 @@ celery-dev:
 	celery --app=cobra.cobra worker -E
 
 test:
-	coverage run --source='cobra' manage.py test
+	coverage run --source='cobra' manage.py test --keepdb
 
 coverage: test
 	coverage report

@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
+from cobra.user.factories import UserFactory
 from cobra.user.managers import CustomUserManager
 from cobra.user.models import CustomUser
 from cobra.utils.test import fake
@@ -22,7 +23,7 @@ class CustomUserTest(TestCase):
         self.assertTrue(isinstance(CustomUser._default_manager, CustomUserManager))
 
     def test_email_unique_constraint(self):
-        same_email = "test@example.com"
+        same_email = "tests@example.com"
         CustomUser.objects.create(
             username="test_1",
             first_name=fake.first_name(),
@@ -36,3 +37,11 @@ class CustomUserTest(TestCase):
                 last_name=fake.last_name(),
                 email=same_email,
             )
+
+    def test_repr(self):
+        self.assertEqual(
+            repr(user := UserFactory()), f"CustomUser(username='{user.username}')"
+        )
+
+    def test_str(self):
+        self.assertEqual(str(user := UserFactory()), user.username)

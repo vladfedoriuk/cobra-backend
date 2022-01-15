@@ -387,7 +387,10 @@ class TestJwtViews(APITestCase, URLPatternsTestCase):
     class TestApiView(APIView):
         permission_classes = [IsAuthenticated]
 
-        def get(self, *args, **kwargs):
+        def get(self, request, *args, **kwargs):
+            assert (
+                request.user.is_authenticated
+            ), "The user must be authenticated to access this resource."
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     urlpatterns = [
@@ -406,14 +409,14 @@ class TestJwtViews(APITestCase, URLPatternsTestCase):
             JWTTokenVerifyView.as_view(),
             name="api-auth-jwt-verify",
         ),
-        path("test/", TestApiView.as_view(), name="api-auth-test"),
+        path("tests/", TestApiView.as_view(), name="api-auth-tests"),
     ]
 
     def setUp(self):
         self.jwt_create_url: str = reverse("api-auth-jwt-create")
         self.jwt_refresh_url: str = reverse("api-auth-jwt-refresh")
         self.jwt_verify_url: str = reverse("api-auth-jwt-verify")
-        self.test_endpoint_url: str = reverse("api-auth-test")
+        self.test_endpoint_url: str = reverse("api-auth-tests")
 
     def test_not_authenticated_request(self):
         response: Response = self.client.get(self.test_endpoint_url)

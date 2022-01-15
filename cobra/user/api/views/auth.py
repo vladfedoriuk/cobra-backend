@@ -9,6 +9,7 @@ from djoser.serializers import (
     PasswordResetConfirmRetypeSerializer,
     SendEmailResetSerializer,
     UserCreatePasswordRetypeSerializer,
+    UserSerializer,
 )
 from drf_yasg import openapi
 from rest_framework import status
@@ -117,10 +118,21 @@ class AuthUserViewSet(djoser_views.UserViewSet):
         the confirmation email and signals. Creates a new user in the database.
 
         :param serializer: Serializer
-        :return: Response
+        :return: None
         """
         user: UserCreatePasswordRetypeSerializer = serializer.save()
         if djoser_settings.SEND_ACTIVATION_EMAIL:
+            send_activation_email.apply_async(kwargs={"user_pk": user.pk})
+
+    def perform_update(self, serializer: UserSerializer):
+        """
+        Overrides the Djoser implementation by sending activation email only to inactive users.
+        :param serializer: UserSerializer
+        :return: None
+        """
+        super(djoser_views.UserViewSet, self).perform_update(serializer)
+        user = serializer.instance
+        if djoser_settings.SEND_ACTIVATION_EMAIL and not user.is_active:
             send_activation_email.apply_async(kwargs={"user_pk": user.pk})
 
     @action(detail=False, methods=["post"])

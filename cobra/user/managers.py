@@ -1,12 +1,19 @@
-from typing import Optional, Tuple, cast
+from typing import Optional, Tuple, TypeVar, cast
 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
+from cobra.user.querysets import CustomUserQueryset
 
-class CustomUserManager(BaseUserManager):
+ModelType = TypeVar("ModelType", bound=AbstractUser)
+
+
+class CustomUserManager(BaseUserManager[ModelType]):
     use_in_migrations: bool = True
+
+    def get_queryset(self):
+        return CustomUserQueryset[ModelType](self.model, using=self._db)
 
     def __parse_params(
         self,

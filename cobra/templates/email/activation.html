@@ -10,9 +10,9 @@
 
 {% block content %}
 
-{%translate "Hi" %} {{user.get_full_name}},
+{% translate "Hi" %} {{user.get_full_name}},
 
-{% translate "To finish your registration at "%}<strong>{% settings_value "APPLICATION_NAME" %}<strong>,
+{% translate "To activate your account at "%}<strong>{% settings_value "APPLICATION_NAME" %}</strong>,
 {%translate "please follow the " %}: <a href="{{activation_url}}">{% translate "link" %}</a>.
 
 {% endblock %}
