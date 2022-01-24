@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin
@@ -24,6 +25,9 @@ class ProjectInvitationViewSet(RetrieveModelMixin, GenericViewSet):
     serializer_class = ProjectInvitationSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [IsInviterOrInvitedUserFilterBackend]
+
+    def get_queryset(self) -> QuerySet[ProjectInvitation]:
+        return super().get_queryset().select_related("user", "inviter", "project")
 
     @action(detail=True, methods=["post"], permission_classes=[IsInvitedUser])
     def accept(self, *args, **kwargs):

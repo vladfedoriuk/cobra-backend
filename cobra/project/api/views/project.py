@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.db.models import QuerySet
 from rest_flex_fields import FlexFieldsModelViewSet
 from rest_framework import status
@@ -30,7 +32,17 @@ from cobra.project.models import (
 from cobra.user.utils.serializers import ActiveCustomUserEmailSerializer
 
 
-class ProjectViewSet(FlexFieldsModelViewSet):
+class GetProjectQuerysetMixin:
+    def get_queryset(self):
+        return (
+            cast(GenericAPIView, super())
+            .get_queryset()
+            .select_related("creator")
+            .prefetch_related("members")
+        )
+
+
+class ProjectViewSet(GetProjectQuerysetMixin, FlexFieldsModelViewSet):
     permit_list_expands = ["creator", "members", "project", "user", "parent", "epic"]
     permission_classes = [IsAuthenticated]
     queryset = Project.objects.all()
@@ -127,7 +139,9 @@ class ProjectViewSet(FlexFieldsModelViewSet):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class RetrieveProjectApiView(GenericAPIView, RetrieveModelMixin):
+class RetrieveProjectApiView(
+    GetProjectQuerysetMixin, GenericAPIView, RetrieveModelMixin
+):
     queryset = Project.objects.all()
     permission_classes = [
         CustomIsAdminUser | IsProjectCreator | IsProjectMemberAndReadOnly

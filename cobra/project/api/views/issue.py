@@ -1,3 +1,6 @@
+from typing import cast
+
+from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_flex_fields.views import FlexFieldsMixin
 from rest_framework import status
@@ -19,7 +22,17 @@ from cobra.project.models import Issue
 from cobra.project.utils.types import HTTP_METHODS
 
 
+class GetIssueQuerysetMixin:
+    def get_queryset(self) -> QuerySet[Issue]:
+        return (
+            cast(GenericViewSet, super())
+            .get_queryset()
+            .select_related("parent", "project", "creator", "assignee")
+        )
+
+
 class IssueUpdateRetrieveViewSet(
+    GetIssueQuerysetMixin,
     FlexFieldsMixin,
     GenericViewSet,
     UpdateModelMixin,
@@ -30,8 +43,6 @@ class IssueUpdateRetrieveViewSet(
     serializer_class = IssueSerializer
     permission_classes = [IsIssueProjectCreator | IsIssueProjectMember]
     filter_backends = [IsIssueProjectMemberOrCreatorFilterBackend]
-
-    permit_list_expands = ["parent", "project", "creator", "assignee"]
 
     LOGGED_TIME_METHODS: HTTP_METHODS = ["get", "post"]
     COMMENTS_METHODS = LOGGED_TIME_METHODS
@@ -98,9 +109,14 @@ class IssueUpdateRetrieveViewSet(
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class IssueListViewSet(GenericViewSet, ListModelMixin):
+class IssueListViewSet(
+    GetIssueQuerysetMixin, FlexFieldsMixin, GenericViewSet, ListModelMixin
+):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated]
+
+    permit_list_expands = ["parent", "project", "creator", "assignee"]
+
     filter_backends = [DjangoFilterBackend, IsIssueProjectMemberOrCreatorFilterBackend]
     filterset_class = IssueFilter

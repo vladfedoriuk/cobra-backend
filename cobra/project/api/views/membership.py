@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -22,6 +23,9 @@ class ProjectMembershipViewSet(GenericViewSet):
     serializer_class = ProjectMembershipSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [HasAssociatedProjectMembershipFilterBackend]
+
+    def get_queryset(self) -> QuerySet[ProjectMembership]:
+        return super().get_queryset().select_related("project", "user")
 
     @action(
         detail=True,

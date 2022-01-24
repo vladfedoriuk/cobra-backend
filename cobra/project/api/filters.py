@@ -1,14 +1,8 @@
 import django_filters.rest_framework
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from rest_framework import filters
 
-from cobra.project.models import (
-    Epic,
-    Issue,
-    Project,
-    ProjectInvitation,
-    ProjectMembership,
-)
+from cobra.project.models import Epic, Issue, Project, ProjectMembership
 
 
 class IsProjectMemberOrCreatorFilterBackend(filters.BaseFilterBackend):
@@ -17,9 +11,6 @@ class IsProjectMemberOrCreatorFilterBackend(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        queryset: QuerySet[Project] = queryset.prefetch_related(
-            "members"
-        ).select_related("creator")
         user = request.user
         if not user.is_staff and user.is_authenticated:
             user_pk = user.pk
@@ -35,9 +26,6 @@ class IsInviterOrInvitedUserFilterBackend(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        queryset: QuerySet[ProjectInvitation] = queryset.select_related(
-            "user", "inviter", "project"
-        )
         user = request.user
         if not user.is_staff and user.is_authenticated:
             queryset = queryset.filter(Q(user__pk=user.pk) | Q(inviter__pk=user.pk))
@@ -50,9 +38,6 @@ class HasAssociatedProjectMembershipFilterBackend(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        queryset: QuerySet[ProjectMembership] = queryset.select_related(
-            "project", "user"
-        )
         user = request.user
         if not user.is_staff and user.is_authenticated:
             user_projects = ProjectMembership.objects.filter(
@@ -68,9 +53,6 @@ class IsIssueProjectMemberOrCreatorFilterBackend(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        queryset: QuerySet[Issue] = queryset.select_related(
-            "project", "assignee", "creator"
-        )
         user = request.user
         if not user.is_staff and user.is_authenticated:
             user_projects = Project.objects.filter(
@@ -86,7 +68,6 @@ class IsEpicProjectMemberOrCreatorFilterBackend(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        queryset: QuerySet[Epic] = queryset.select_related("project", "creator")
         user = request.user
         if not user.is_staff and user.is_authenticated:
             user_projects = Project.objects.filter(

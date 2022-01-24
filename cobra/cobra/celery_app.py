@@ -27,5 +27,4 @@ def debug_task(self):
 
 @signals.setup_logging.connect
 def on_celery_setup_logging(**kwargs):
-    config = CELERY_LOGGING
-    logging.config.dictConfig(config)
+    logging.config.dictConfig(CELERY_LOGGING)

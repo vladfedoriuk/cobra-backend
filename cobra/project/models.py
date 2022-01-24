@@ -56,7 +56,7 @@ class Project(TimeStampedAndCreatedByUser):
         related_query_name="project",
     )
 
-    objects: models.Manager["Project"] = ProjectManager()
+    objects: models.Manager["Project"] = ProjectManager["Project"]()
 
     def save(self, *args, **kwargs):
         if not self.slug:
