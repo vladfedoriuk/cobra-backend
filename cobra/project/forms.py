@@ -143,7 +143,7 @@ class IssueAdminForm(forms.ModelForm):
         if (
             project
             and assignee
-            and not (project.members.all().filter(pk=assignee.pk).exists())
+            and not ProjectMembership.objects.is_user_project_member(assignee, project)
         ):
             self.add_error(
                 key := "assignee",
