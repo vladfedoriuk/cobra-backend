@@ -13,7 +13,7 @@ from cobra.project.models import (
     ProjectInvitation,
     ProjectMembership,
 )
-from cobra.project.utils.models import BUG, MAINTAINER, TASK, TASK_TYPES, USER_STORY
+from cobra.project.utils.models import BUG, TASK, TASK_TYPES, USER_STORY
 from cobra.user.models import CustomUser
 
 
@@ -37,11 +37,8 @@ class ProjectInvitationAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         inviter: CustomUser = cleaned_data.get("inviter")
         project: Project = cleaned_data.get("project")
-        if not (
-            ProjectMembership.objects.filter(
-                user=inviter, role=MAINTAINER, project=project
-            ).exists()
-            or project.creator == inviter
+        if not ProjectMembership.objects.is_user_project_maintainer_or_creator(
+            inviter, project
         ):
             self.add_error(
                 "inviter",
@@ -67,9 +64,8 @@ class EpicAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         creator: CustomUser = cleaned_data.get("creator")
         project: Project = cleaned_data.get("project")
-        if not (
-            ProjectMembership.objects.filter(user=creator, project=project).exists()
-            or project.creator == creator
+        if not ProjectMembership.objects.is_user_project_member_or_creator(
+            creator, project
         ):
             self.add_error(
                 "creator",
@@ -136,8 +132,9 @@ class IssueAdminForm(forms.ModelForm):
         if (
             project
             and creator
-            and creator not in project.members.all()
-            and creator != project.creator
+            and not ProjectMembership.objects.is_user_project_member_or_creator(
+                creator, project
+            )
         ):
             self.add_error(
                 key := "creator",

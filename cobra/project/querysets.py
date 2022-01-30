@@ -22,3 +22,7 @@ class ProjectQueryset(models.QuerySet[ModelType]):
             if not getattr(obj, "slug", ""):
                 setattr(obj, "slug", slugify(str(getattr(obj, "title", ""))))
         return super().bulk_create(objects, batch_size, ignore_conflicts)
+
+
+class ProjectMembershipQueryset(models.QuerySet[ModelType]):
+    pass

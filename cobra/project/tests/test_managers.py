@@ -1,7 +1,10 @@
 from django.test import TestCase
 from faker.utils.text import slugify
+from parameterized import parameterized
 
-from cobra.project.models import Project
+from cobra.project.factories import ProjectFactory, ProjectMembershipFactory
+from cobra.project.models import Project, ProjectMembership
+from cobra.project.utils.models import DEVELOPER, MAINTAINER
 from cobra.user.factories import UserFactory
 from cobra.utils.test import fake
 
@@ -48,3 +51,85 @@ class ProjectManagerTest(TestCase):
         )
         self.assertTrue(created)
         self.assertEqual(project.slug, slugify(project.title))
+
+
+class ProjectMembershipManagerTest(TestCase):
+    def setUp(self) -> None:
+        self.user = UserFactory()
+        self.project = ProjectFactory()
+
+    @parameterized.expand(
+        [
+            (None, None, True),
+            (UserFactory, None, False),
+            (None, ProjectFactory, False),
+            (UserFactory, ProjectFactory, False),
+        ]
+    )
+    def test_is_user_project_member(self, user, project, is_member):
+        ProjectMembershipFactory.create(user=self.user, project=self.project)
+        self.assertTrue(
+            ProjectMembership.objects.is_user_project_member(
+                user() if user else self.user, project() if project else self.project
+            )
+            is is_member
+        )
+
+    @parameterized.expand(
+        [
+            (None, None, True),
+            (UserFactory, None, False),
+            (None, ProjectFactory, False),
+            (UserFactory, ProjectFactory, False),
+        ]
+    )
+    def test_is_user_project_developer(self, user, project, is_developer):
+        ProjectMembershipFactory.create(
+            project=self.project,
+            user=self.user,
+            role=DEVELOPER,
+        )
+        self.assertTrue(
+            ProjectMembership.objects.is_user_project_developer(
+                user() if user else self.user, project() if project else self.project
+            )
+            is is_developer
+        )
+
+    @parameterized.expand(
+        [
+            (None, None, True),
+            (UserFactory, None, False),
+            (None, ProjectFactory, False),
+            (UserFactory, ProjectFactory, False),
+        ]
+    )
+    def test_is_user_project_maintainer(self, user, project, is_maintainer):
+        ProjectMembershipFactory.create(
+            project=self.project,
+            user=self.user,
+            role=MAINTAINER,
+        )
+        self.assertTrue(
+            ProjectMembership.objects.is_user_project_maintainer(
+                user() if user else self.user, project() if project else self.project
+            )
+            is is_maintainer
+        )
+
+    @parameterized.expand(
+        [
+            (None, "is_user_project_member_or_creator"),
+            (DEVELOPER, "is_user_project_developer_or_creator"),
+            (MAINTAINER, "is_user_project_maintainer_or_creator"),
+        ]
+    )
+    def test_is_user_project_member_or_creator(self, role, method_name):
+        project = ProjectFactory()
+        project_membership = ProjectMembershipFactory(project=project)
+        if role is not None:
+            project_membership.role = role
+            project_membership.save(update_fields=["role"])
+        method = getattr(ProjectMembership.objects, method_name)
+        self.assertTrue(method(project.creator, project))
+        self.assertTrue(method(project_membership.user, project))

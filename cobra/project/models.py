@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from cobra.project.managers import (
     BugManager,
     ProjectManager,
+    ProjectMembershipManager,
     TaskManager,
     UserStoryManager,
 )
@@ -82,6 +83,10 @@ class ProjectMembership(TimeStampedModel):
         verbose_name=_("user"),
     )
     role = models.CharField(_("role"), max_length=20, choices=ROLES, default=DEVELOPER)
+
+    objects: models.Manager["ProjectMembership"] = ProjectMembershipManager[
+        "ProjectMembership"
+    ]()
 
     class Meta:
         constraints: list[
@@ -242,7 +247,7 @@ class LoggedTime(TimeStampedAndRelatedToUser, RelatedToIssue):
         verbose_name_plural = _("Logged time")
 
     def __repr__(self):
-        return f"LoggedTime(user{self.user}, issue={self.issue}, time={self.time}"
+        return f"LoggedTime(user{self.user}, issue={self.issue}, time={self.time})"
 
     def __str__(self):
         return f"User {self.user} logged {self.time} working on {self.issue}"
@@ -252,7 +257,7 @@ class IssueComment(TimeStampedAndRelatedToUser, RelatedToIssue):
     content = models.TextField(_("content"))
 
     def __repr__(self):
-        return f"IssueComment(user={self.user}, issue={self.issue}"
+        return f"IssueComment(user={self.user}, issue={self.issue})"
 
     def __str__(self):
         return f"User {self.user} comments {self.issue}"
