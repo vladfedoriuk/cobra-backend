@@ -4,7 +4,12 @@ from typing import TYPE_CHECKING, Optional, TypeVar
 from django.db import models
 from django.db.models import QuerySet
 
-from cobra.project.querysets import ProjectMembershipQueryset, ProjectQueryset
+from cobra.project.querysets import (
+    EpicQueryset,
+    IssueQueryset,
+    ProjectMembershipQueryset,
+    ProjectQueryset,
+)
 from cobra.project.utils.models import BUG, DEVELOPER, MAINTAINER, TASK, USER_STORY
 from cobra.user.models import CustomUser
 
@@ -55,6 +60,26 @@ class ProjectMembershipManager(models.Manager[ModelType]):
     is_user_project_maintainer_or_creator = partialmethod(
         is_user_project_member_or_creator, role=MAINTAINER
     )
+
+
+class IssueManager(models.Manager[ModelType]):
+    use_in_migrations = True
+
+    def get_queryset(self) -> QuerySet[ModelType]:
+        return IssueQueryset[ModelType](self.model, using=self.db)
+
+    def filter_for_project(self, project: Project) -> QuerySet[ModelType]:
+        return self.filter(project=project)
+
+
+class EpicManager(models.Manager[ModelType]):
+    use_in_migrations = True
+
+    def get_queryset(self) -> QuerySet[ModelType]:
+        return EpicQueryset[ModelType](self.model, using=self.db)
+
+    def filter_for_project(self, project: Project) -> QuerySet[ModelType]:
+        return self.filter(project=project)
 
 
 class TaskManager(models.Manager[ModelType]):

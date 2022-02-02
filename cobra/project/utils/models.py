@@ -1,4 +1,5 @@
 from collections import Sequence
+from typing import Final
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -32,7 +33,7 @@ class RelatedToIssue(models.Model):
 
 DEVELOPER = "developer"
 MAINTAINER = "maintainer"
-ROLES: Sequence[tuple[str, str]] = (
+ROLES: Final[Sequence[tuple[str, str]]] = (
     (DEVELOPER, _("Developer")),
     (MAINTAINER, _("Maintainer")),
 )
@@ -41,7 +42,7 @@ ROLES: Sequence[tuple[str, str]] = (
 PENDING = "pending"
 ACCEPTED = "accepted"
 REJECTED = "rejected"
-INVITATION_STATUSES: Sequence[tuple[str, str]] = (
+INVITATION_STATUSES: Final[Sequence[tuple[str, str]]] = (
     (PENDING, _("Pending")),
     (ACCEPTED, _("Accepted")),
     (REJECTED, _("Rejected")),
@@ -52,7 +53,7 @@ NEW = "new"
 IN_PROGRESS = "in-progress"
 CLOSED = "closed"
 RELEASE_READY = "release-ready"
-TASK_STATUSES: Sequence[tuple[str, str]] = (
+TASK_STATUSES: Final[Sequence[tuple[str, str]]] = (
     (NEW, _("New")),
     (IN_PROGRESS, _("In progress")),
     (CLOSED, _("Closed")),
@@ -62,7 +63,7 @@ TASK_STATUSES: Sequence[tuple[str, str]] = (
 TASK = "task"
 USER_STORY = "user-story"
 BUG = "bug"
-TASK_TYPES: Sequence[tuple[str, str]] = (
+TASK_TYPES: Final[Sequence[tuple[str, str]]] = (
     (TASK, _("Task")),
     (USER_STORY, _("User story")),
     (BUG, _("Bug")),

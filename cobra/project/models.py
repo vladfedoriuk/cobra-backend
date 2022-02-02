@@ -1,5 +1,3 @@
-from typing import Union
-
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -8,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cobra.project.managers import (
     BugManager,
+    EpicManager,
+    IssueManager,
     ProjectManager,
     ProjectMembershipManager,
     TaskManager,
@@ -41,9 +41,7 @@ class Project(TimeStampedAndCreatedByUser):
     slug = models.SlugField(_("slug"), max_length=250, blank=True)
 
     class Meta:
-        constraints: list[
-            Union[models.UniqueConstraint, models.Deferrable, models.CheckConstraint]
-        ] = [
+        constraints = [
             models.UniqueConstraint(
                 fields=["slug", "creator"], name="slug_and_creator_unique_constraint"
             )
@@ -89,9 +87,7 @@ class ProjectMembership(TimeStampedModel):
     ]()
 
     class Meta:
-        constraints: list[
-            Union[models.UniqueConstraint, models.Deferrable, models.CheckConstraint]
-        ] = [
+        constraints = [
             models.UniqueConstraint(
                 fields=["project", "user"], name="project_and_user_unique_constraint"
             )
@@ -153,6 +149,8 @@ class Epic(TimeStampedAndCreatedByUser, RelatedToProject):
     title = models.CharField(_("title"), max_length=250)
     description = models.TextField(_("description"), blank=True)
 
+    objects: models.Manager["Epic"] = EpicManager["Epic"]()
+
     def __repr__(self):
         return (
             f"Epic(title={self.title}, creator={self.creator}, project={self.project})"
@@ -199,6 +197,7 @@ class Issue(TimeStampedAndCreatedByUser, RelatedToProject):
         blank=True,
         null=True,
     )
+    objects: models.Manager["Issue"] = IssueManager["Issue"]()
 
     def __repr__(self):
         return (

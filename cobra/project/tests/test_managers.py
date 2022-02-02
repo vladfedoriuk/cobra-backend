@@ -2,8 +2,12 @@ from django.test import TestCase
 from faker.utils.text import slugify
 from parameterized import parameterized
 
-from cobra.project.factories import ProjectFactory, ProjectMembershipFactory
-from cobra.project.models import Project, ProjectMembership
+from cobra.project.factories import (
+    IssueFactory,
+    ProjectFactory,
+    ProjectMembershipFactory,
+)
+from cobra.project.models import Issue, Project, ProjectMembership
 from cobra.project.utils.models import DEVELOPER, MAINTAINER
 from cobra.user.factories import UserFactory
 from cobra.utils.test import fake
@@ -133,3 +137,10 @@ class ProjectMembershipManagerTest(TestCase):
         method = getattr(ProjectMembership.objects, method_name)
         self.assertTrue(method(project.creator, project))
         self.assertTrue(method(project_membership.user, project))
+
+
+class IssueManagerTest(TestCase):
+    def test_filter_for_project(self):
+        project = ProjectFactory()
+        issue = IssueFactory(project=project)
+        self.assertEqual(Issue.objects.filter_for_project(project).first(), issue)

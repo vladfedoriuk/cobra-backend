@@ -15,10 +15,7 @@ from cobra.project.models import (
 )
 from cobra.project.utils.models import BUG, TASK, TASK_TYPES, USER_STORY
 from cobra.user.models import CustomUser
-
-
-class ExcludeDatesMeta:
-    exclude = ["created", "modified"]
+from cobra.utils.forms import ExcludeDatesMeta
 
 
 class ProjectAdminForm(forms.ModelForm):
@@ -106,8 +103,8 @@ class IssueAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.is_bound and self.instance.pk:
             self.fields["assignee"].queryset = self.instance.project.members.all()
-            self.fields["parent"].queryset = Issue.objects.filter(
-                project__pk=self.instance.project.pk
+            self.fields["parent"].queryset = Issue.objects.filter_for_project(
+                self.instance.project
             ).exclude(pk=self.instance.pk)
             self.fields["epic"].queryset = Epic.objects.filter(
                 project__pk=self.instance.project.pk

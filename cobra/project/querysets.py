@@ -26,3 +26,11 @@ class ProjectQueryset(models.QuerySet[ModelType]):
 
 class ProjectMembershipQueryset(models.QuerySet[ModelType]):
     pass
+
+
+class EpicQueryset(models.QuerySet[ModelType]):
+    pass
+
+
+class IssueQueryset(models.QuerySet[ModelType]):
+    pass

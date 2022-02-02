@@ -49,4 +49,5 @@ test:
 	coverage run --source='cobra' manage.py test --keepdb
 
 coverage: test
+	coverage html
 	coverage report
